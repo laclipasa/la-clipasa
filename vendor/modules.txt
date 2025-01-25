@@ -87,9 +87,10 @@ github.com/smartystreets/assertions/internal/oglematchers
 github.com/smartystreets/gunit
 github.com/smartystreets/gunit/reports
 github.com/smartystreets/gunit/scan
-# github.com/stretchr/testify v1.9.0
+# github.com/stretchr/testify v1.10.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/require
 # go.uber.org/atomic v1.11.0
 ## explicit; go 1.18
