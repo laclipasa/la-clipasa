@@ -15,7 +15,7 @@ require (
 	github.com/smartystreets/gunit v1.4.5
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/sync v0.8.0
+	golang.org/x/sync v0.10.0
 )
 
 require (
