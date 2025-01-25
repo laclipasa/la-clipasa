@@ -1,0 +1,17 @@
+# for vscode gql extension
+type Query {
+  _empty: String
+}
+
+# for vscode gql extension
+type Mutation {
+  _empty: String
+}
+
+
+interface Node {
+  nodeId: ID!
+}
+
+scalar Time
+

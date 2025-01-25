@@ -1,0 +1,2 @@
+schema: "gql/schema/*.graphql"
+documents: ['frontend/**/*.{graphql}', 'frontend/**/graphql/**/*.{ts,tsx}']
