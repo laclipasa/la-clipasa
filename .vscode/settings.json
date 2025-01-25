@@ -1,0 +1,26 @@
+{
+  // --
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": [
+    "--config=${workspaceFolder}/.golangci.yml",
+    "--issues-exit-code=0",
+    // golangci possibly broke generated code skipping in recent releases.
+    // "--fix",
+    "--fast" // breaks some linters like errcheck, if its too slow then enable back
+  ],
+  "go.lintOnSave": "package",
+  "go.testFlags": [
+    "-count=1",
+    "-v"
+  ],
+  // "go.testEnvFile": null,
+  // --
+  "shellcheck.executablePath": "shellcheck",
+  "shellcheck.customArgs": [
+    "-x",
+    // source-path doesnt work per script
+    // but it does here (checks outside source-path remain broken)
+    // "--source-path=../.",
+    "--external-sources"
+  ],
+}
