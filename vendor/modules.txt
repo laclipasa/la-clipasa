@@ -4,8 +4,8 @@ github.com/davecgh/go-spew/spew
 # github.com/fatih/structs v1.1.0
 ## explicit
 github.com/fatih/structs
-# github.com/golang-migrate/migrate/v4 v4.17.1
-## explicit; go 1.18
+# github.com/golang-migrate/migrate/v4 v4.18.1
+## explicit; go 1.22.0
 github.com/golang-migrate/migrate/v4
 github.com/golang-migrate/migrate/v4/database
 github.com/golang-migrate/migrate/v4/database/multistmt
@@ -74,8 +74,6 @@ github.com/patrickmn/go-cache
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib
-# github.com/rogpeppe/go-internal v1.12.0
-## explicit; go 1.20
 # github.com/smartystreets/assertions v1.13.1
 ## explicit; go 1.18
 github.com/smartystreets/assertions
@@ -110,16 +108,14 @@ go.uber.org/zap/internal/stacktrace
 go.uber.org/zap/internal/ztest
 go.uber.org/zap/zapcore
 go.uber.org/zap/zaptest
-# golang.org/x/crypto v0.26.0
+# golang.org/x/crypto v0.27.0
 ## explicit; go 1.20
 golang.org/x/crypto/pbkdf2
-# golang.org/x/net v0.28.0
-## explicit; go 1.18
 # golang.org/x/sync v0.8.0
 ## explicit; go 1.18
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/text v0.17.0
+# golang.org/x/text v0.18.0
 ## explicit; go 1.18
 golang.org/x/text/cases
 golang.org/x/text/internal
@@ -134,8 +130,6 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/tools v0.24.0
-## explicit; go 1.19
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
