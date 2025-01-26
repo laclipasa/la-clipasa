@@ -1115,6 +1115,7 @@ migrate_post() {
 }
 
 # Wrapper for golang-migrate with predefined configuration.
+# TODO: migrate to use golang-migrate as a package and just execute on server start
 x.migrate() {
   { { {
     [[ $X_ENV = "prod" ]] && with_tty confirm "This will run migrations on production. Continue?"
@@ -1135,7 +1136,6 @@ x.migrate() {
   } 2>&4 | xlog >&3; } 4>&1 | xerr >&3; } 3>&1
 }
 
-# TODO: generate sql with ent https://entgo.io/docs/versioned-migrations/
 # Create a new migration file with the given `name`.
 # Args: name
 x.migrate.create() {
@@ -1145,6 +1145,28 @@ x.migrate.create() {
     name="${tmp,,}"
     test -z $name && err "Please provide a migration name"
     x.migrate create -ext sql -dir $MIGRATIONS_DIR/ -seq -digits 7 "$name"
+  } 2>&4 | xlog >&3; } 4>&1 | xerr >&3; } 3>&1
+}
+
+# Generate the required SQL migrations to sync ent schema.
+# Args: name
+x.ent.generate-migration() {
+  { { {
+    tmp="$*"
+    tmp="${tmp// /_}"
+    name="${tmp,,}"
+    test -z $name && err "Please provide a migration name"
+    go run -mod=mod ent/migrate/main.go "$name"
+  } 2>&4 | xlog >&3; } 4>&1 | xerr >&3; } 3>&1
+}
+
+x.ent.validate-migrations() {
+  { { {
+    tmp="$*"
+    tmp="${tmp// /_}"
+    name="${tmp,,}"
+    test -z $name && err "Please provide a migration name"
+    go run -mod=mod ent/migrate/main.go "$name"
   } 2>&4 | xlog >&3; } 4>&1 | xerr >&3; } 3>&1
 }
 

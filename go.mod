@@ -23,7 +23,10 @@ require (
 )
 
 require (
+	ariga.io/atlas/cmd/atlas v0.13.1 // indirect
+	cloud.google.com/go/secretmanager v1.14.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.11 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
@@ -51,7 +54,7 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/lib/pq v1.10.9 // indirect
-	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
+	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.3.1 // indirect

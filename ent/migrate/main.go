@@ -32,7 +32,7 @@ func main() {
 
 	ctx := context.Background()
 	// Create a local migration directory able to understand golang-migrate migration file format for replay.
-	dir, err := sqltool.NewGolangMigrateDir("ent/migrate/migrations")
+	dir, err := sqltool.NewGolangMigrateDir("db/migrations")
 	if err != nil {
 		log.Fatalf("failed creating atlas migration directory: %v", err)
 	}

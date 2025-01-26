@@ -8,6 +8,14 @@ type Mutation {
   _empty: String
 }
 
+scalar Cursor
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: Cursor
+  endCursor: Cursor
+}
 
 interface Node {
   nodeId: ID!

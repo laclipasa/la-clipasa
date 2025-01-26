@@ -13,6 +13,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/laclipasa/la-clipasa/ent"
@@ -67,10 +68,28 @@ type ComplexityRoot struct {
 		UpdatedAt    func(childComplexity int) int
 	}
 
+	NoteConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	NoteEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	PageInfo struct {
+		EndCursor       func(childComplexity int) int
+		HasNextPage     func(childComplexity int) int
+		HasPreviousPage func(childComplexity int) int
+		StartCursor     func(childComplexity int) int
+	}
+
 	Query struct {
 		Empty func(childComplexity int) int
 		Node  func(childComplexity int, nodeID string) int
-		Notes func(childComplexity int) int
+		Notes func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int) int
 	}
 }
 
@@ -88,7 +107,7 @@ type NoteResolver interface {
 }
 type QueryResolver interface {
 	Empty(ctx context.Context) (*string, error)
-	Notes(ctx context.Context) ([]*ent.Note, error)
+	Notes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int) (*ent.NoteConnection, error)
 	Node(ctx context.Context, nodeID string) (ent.Noder, error)
 }
 
@@ -203,6 +222,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Note.UpdatedAt(childComplexity), true
 
+	case "NoteConnection.edges":
+		if e.complexity.NoteConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.NoteConnection.Edges(childComplexity), true
+
+	case "NoteConnection.pageInfo":
+		if e.complexity.NoteConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.NoteConnection.PageInfo(childComplexity), true
+
+	case "NoteConnection.totalCount":
+		if e.complexity.NoteConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.NoteConnection.TotalCount(childComplexity), true
+
+	case "NoteEdge.cursor":
+		if e.complexity.NoteEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.NoteEdge.Cursor(childComplexity), true
+
+	case "NoteEdge.node":
+		if e.complexity.NoteEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.NoteEdge.Node(childComplexity), true
+
+	case "PageInfo.endCursor":
+		if e.complexity.PageInfo.EndCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.EndCursor(childComplexity), true
+
+	case "PageInfo.hasNextPage":
+		if e.complexity.PageInfo.HasNextPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasNextPage(childComplexity), true
+
+	case "PageInfo.hasPreviousPage":
+		if e.complexity.PageInfo.HasPreviousPage == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.HasPreviousPage(childComplexity), true
+
+	case "PageInfo.startCursor":
+		if e.complexity.PageInfo.StartCursor == nil {
+			break
+		}
+
+		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
 	case "Query._empty":
 		if e.complexity.Query.Empty == nil {
 			break
@@ -227,7 +309,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Notes(childComplexity), true
+		args, err := ec.field_Query_notes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Notes(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int)), true
 
 	}
 	return 0, false
@@ -515,6 +602,103 @@ func (ec *executionContext) field_Query_node_argsNodeID(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_notes_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_notes_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg0
+	arg1, err := ec.field_Query_notes_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg1
+	arg2, err := ec.field_Query_notes_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg2
+	arg3, err := ec.field_Query_notes_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg3
+	return args, nil
+}
+func (ec *executionContext) field_Query_notes_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*entgql.Cursor[int], error) {
+	if _, ok := rawArgs["after"]; !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_notes_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["first"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_notes_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*entgql.Cursor[int], error) {
+	if _, ok := rawArgs["before"]; !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_notes_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["last"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
 	return zeroVal, nil
 }
 
@@ -1128,6 +1312,422 @@ func (ec *executionContext) fieldContext_Note_updatedAt(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _NoteConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.NoteConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NoteConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.NoteEdge)
+	fc.Result = res
+	return ec.marshalONoteEdge2ᚕᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NoteConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NoteConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_NoteEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_NoteEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type NoteEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NoteConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.NoteConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NoteConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[int])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NoteConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NoteConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NoteConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.NoteConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NoteConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NoteConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NoteConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NoteEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.NoteEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NoteEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Note)
+	fc.Result = res
+	return ec.marshalONote2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNote(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NoteEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NoteEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Note_id(ctx, field)
+			case "nodeId":
+				return ec.fieldContext_Note_nodeId(ctx, field)
+			case "title":
+				return ec.fieldContext_Note_title(ctx, field)
+			case "bodyMarkdown":
+				return ec.fieldContext_Note_bodyMarkdown(ctx, field)
+			case "bodyHtml":
+				return ec.fieldContext_Note_bodyHtml(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Note_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Note_updatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Note", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _NoteEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.NoteEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_NoteEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_NoteEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "NoteEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *entgql.PageInfo[int]) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasNextPage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PageInfo_hasNextPage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field graphql.CollectedField, obj *entgql.PageInfo[int]) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasPreviousPage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PageInfo_hasPreviousPage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field graphql.CollectedField, obj *entgql.PageInfo[int]) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_startCursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartCursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PageInfo_startCursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *entgql.PageInfo[int]) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_endCursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndCursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PageInfo_endCursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PageInfo",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query__empty(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query__empty(ctx, field)
 	if err != nil {
@@ -1183,7 +1783,7 @@ func (ec *executionContext) _Query_notes(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Notes(rctx)
+		return ec.resolvers.Query().Notes(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1195,12 +1795,12 @@ func (ec *executionContext) _Query_notes(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*ent.Note)
+	res := resTmp.(*ent.NoteConnection)
 	fc.Result = res
-	return ec.marshalNNote2ᚕᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteᚄ(ctx, field.Selections, res)
+	return ec.marshalNNoteConnection2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_notes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_notes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1208,23 +1808,26 @@ func (ec *executionContext) fieldContext_Query_notes(_ context.Context, field gr
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Note_id(ctx, field)
-			case "nodeId":
-				return ec.fieldContext_Note_nodeId(ctx, field)
-			case "title":
-				return ec.fieldContext_Note_title(ctx, field)
-			case "bodyMarkdown":
-				return ec.fieldContext_Note_bodyMarkdown(ctx, field)
-			case "bodyHtml":
-				return ec.fieldContext_Note_bodyHtml(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Note_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Note_updatedAt(ctx, field)
+			case "edges":
+				return ec.fieldContext_NoteConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_NoteConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_NoteConnection_totalCount(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Note", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type NoteConnection", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_notes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3468,6 +4071,141 @@ func (ec *executionContext) _Note(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var noteConnectionImplementors = []string{"NoteConnection"}
+
+func (ec *executionContext) _NoteConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.NoteConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, noteConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NoteConnection")
+		case "edges":
+			out.Values[i] = ec._NoteConnection_edges(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._NoteConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._NoteConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var noteEdgeImplementors = []string{"NoteEdge"}
+
+func (ec *executionContext) _NoteEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.NoteEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, noteEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NoteEdge")
+		case "node":
+			out.Values[i] = ec._NoteEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._NoteEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var pageInfoImplementors = []string{"PageInfo"}
+
+func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *entgql.PageInfo[int]) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pageInfoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PageInfo")
+		case "hasNextPage":
+			out.Values[i] = ec._PageInfo_hasNextPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "hasPreviousPage":
+			out.Values[i] = ec._PageInfo_hasPreviousPage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "startCursor":
+			out.Values[i] = ec._PageInfo_startCursor(ctx, field, obj)
+		case "endCursor":
+			out.Values[i] = ec._PageInfo_endCursor(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3919,6 +4657,16 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, v any) (entgql.Cursor[int], error) {
+	var res entgql.Cursor[int]
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, sel ast.SelectionSet, v entgql.Cursor[int]) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3953,50 +4701,6 @@ func (ec *executionContext) marshalNNote2githubᚗcomᚋlaclipasaᚋlaᚑclipasa
 	return ec._Note(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNote2ᚕᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Note) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNNote2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNote(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalNNote2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNote(ctx context.Context, sel ast.SelectionSet, v *ent.Note) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -4007,9 +4711,27 @@ func (ec *executionContext) marshalNNote2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclip
 	return ec._Note(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNNoteConnection2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteConnection(ctx context.Context, sel ast.SelectionSet, v ent.NoteConnection) graphql.Marshaler {
+	return ec._NoteConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNNoteConnection2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteConnection(ctx context.Context, sel ast.SelectionSet, v *ent.NoteConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._NoteConnection(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNNoteInput2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋgqlᚋmodelᚐNoteInput(ctx context.Context, v any) (model.NoteInput, error) {
 	res, err := ec.unmarshalInputNoteInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v entgql.PageInfo[int]) graphql.Marshaler {
+	return ec._PageInfo(ctx, sel, &v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
@@ -4321,11 +5043,98 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, v any) (*entgql.Cursor[int], error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(entgql.Cursor[int])
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, sel ast.SelectionSet, v *entgql.Cursor[int]) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
+}
+
 func (ec *executionContext) marshalONode2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v ent.Noder) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Node(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalONote2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNote(ctx context.Context, sel ast.SelectionSet, v *ent.Note) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Note(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalONoteEdge2ᚕᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.NoteEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalONoteEdge2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalONoteEdge2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐNoteEdge(ctx context.Context, sel ast.SelectionSet, v *ent.NoteEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._NoteEdge(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {

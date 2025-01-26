@@ -98,7 +98,7 @@ func New(logger *zap.SugaredLogger, options ...Option) (*pgxpool.Pool, *sql.DB, 
 		// DATA RACE (when using shared typeNames)
 		// pgxAfterConnectLock.Lock()
 		// defer pgxAfterConnectLock.Unlock()
-		var err error
+		/*  var err error
 
 		searchPaths := []string{"public", "xo_tests"}
 		typeNames, err := queryDatabaseTypeNames(c, logger, searchPaths...)
@@ -108,7 +108,7 @@ func New(logger *zap.SugaredLogger, options ...Option) (*pgxpool.Pool, *sql.DB, 
 
 		if err := registerDataTypes(ctx, c, typeNames); err != nil {
 			return internal.WrapErrorf(err, internal.ErrorCodeUnknown, "could not register data types")
-		}
+		} */
 
 		atLeastOneConnInPool.Store(true)
 

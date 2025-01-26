@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"entgo.io/contrib/entgql"
 	"github.com/laclipasa/la-clipasa/ent"
 	"github.com/laclipasa/la-clipasa/ent/note"
 	"github.com/laclipasa/la-clipasa/gql/model"
@@ -58,8 +59,8 @@ func (r *noteResolver) BodyHTML(ctx context.Context, obj *ent.Note) (string, err
 }
 
 // Notes is the resolver for the notes field.
-func (r *queryResolver) Notes(ctx context.Context) ([]*ent.Note, error) {
-	return r.ent.Note.Query().All(ctx)
+func (r *queryResolver) Notes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int) (*ent.NoteConnection, error) {
+	return r.ent.Note.Query().Paginate(ctx, after, first, before, last)
 }
 
 // Node is the resolver for the node field.
@@ -94,15 +95,3 @@ func (r *queryResolver) Node(ctx context.Context, nodeID string) (ent.Noder, err
 func (r *Resolver) Note() NoteResolver { return &noteResolver{r} }
 
 type noteResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *mutationResolver) Node(ctx context.Context, nodeID string) (ent.Noder, error) {
-	panic(fmt.Errorf("not implemented: Node - node"))
-}
-*/

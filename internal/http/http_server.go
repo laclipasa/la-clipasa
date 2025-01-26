@@ -72,6 +72,12 @@ func RunServer(envFile string) {
 
 	ctx := ent.NewContext(context.Background(), entClient)
 
+	/*
+		this automagically syns the schema with the database. do not use
+		if err := entClient.Schema.Create(ctx); err != nil {
+			log.Fatalf("failed initializing migrations table: %v", err)
+		} */
+
 	router := chi.NewRouter()
 
 	router.Use(
@@ -95,7 +101,7 @@ func RunServer(envFile string) {
 
 // TODO: migrate internal/rest.NewServer instead
 // for internal/rest.runTestServer hopefully an adaptation of https://github.com/99designs/gqlgen/blob/master/client/client.go
-// suffices
+// or using https://github.com/Khan/genqlient suffices
 func ListenAndServe(ctx context.Context, addr string, handler http.Handler, shutdownTimeout time.Duration) error {
 	server := &http.Server{Addr: addr, Handler: handler}
 
