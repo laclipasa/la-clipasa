@@ -1,2 +1,2 @@
 schema: "gql/schema/*.graphql"
-documents: ['frontend/**/*.{graphql}', 'frontend/**/graphql/**/*.{ts,tsx}']
+documents: ['testdoc.graphql','frontend/**/*.{graphql}', 'frontend/**/graphql/**/*.{ts,tsx}']

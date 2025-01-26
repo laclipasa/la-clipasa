@@ -1,6 +1,7 @@
 **/repopack-output.*
 **/.vite
 .direnv
+testdoc.graphql
 db/schema.sql
 openapi.exploded.yaml
 openapi.yaml.temp
