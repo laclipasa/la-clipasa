@@ -7,12 +7,320 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/laclipasa/la-clipasa/ent/comment"
 	"github.com/laclipasa/la-clipasa/ent/note"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/predicate"
 	"github.com/laclipasa/la-clipasa/ent/user"
 )
+
+// CommentWhereInput represents a where input for filtering Comment queries.
+type CommentWhereInput struct {
+	Predicates []predicate.Comment  `json:"-"`
+	Not        *CommentWhereInput   `json:"not,omitempty"`
+	Or         []*CommentWhereInput `json:"or,omitempty"`
+	And        []*CommentWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "content" field predicates.
+	Content             *string  `json:"content,omitempty"`
+	ContentNEQ          *string  `json:"contentNEQ,omitempty"`
+	ContentIn           []string `json:"contentIn,omitempty"`
+	ContentNotIn        []string `json:"contentNotIn,omitempty"`
+	ContentGT           *string  `json:"contentGT,omitempty"`
+	ContentGTE          *string  `json:"contentGTE,omitempty"`
+	ContentLT           *string  `json:"contentLT,omitempty"`
+	ContentLTE          *string  `json:"contentLTE,omitempty"`
+	ContentContains     *string  `json:"contentContains,omitempty"`
+	ContentHasPrefix    *string  `json:"contentHasPrefix,omitempty"`
+	ContentHasSuffix    *string  `json:"contentHasSuffix,omitempty"`
+	ContentEqualFold    *string  `json:"contentEqualFold,omitempty"`
+	ContentContainsFold *string  `json:"contentContainsFold,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "deleted_at" field predicates.
+	DeletedAt       *bool `json:"deletedAt,omitempty"`
+	DeletedAtNEQ    *bool `json:"deletedAtNEQ,omitempty"`
+	DeletedAtIsNil  bool  `json:"deletedAtIsNil,omitempty"`
+	DeletedAtNotNil bool  `json:"deletedAtNotNil,omitempty"`
+
+	// "author" edge predicates.
+	HasAuthor     *bool             `json:"hasAuthor,omitempty"`
+	HasAuthorWith []*UserWhereInput `json:"hasAuthorWith,omitempty"`
+
+	// "post" edge predicates.
+	HasPost     *bool             `json:"hasPost,omitempty"`
+	HasPostWith []*PostWhereInput `json:"hasPostWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *CommentWhereInput) AddPredicates(predicates ...predicate.Comment) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the CommentWhereInput filter on the CommentQuery builder.
+func (i *CommentWhereInput) Filter(q *CommentQuery) (*CommentQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyCommentWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyCommentWhereInput is returned in case the CommentWhereInput is empty.
+var ErrEmptyCommentWhereInput = errors.New("ent: empty predicate CommentWhereInput")
+
+// P returns a predicate for filtering comments.
+// An error is returned if the input is empty or invalid.
+func (i *CommentWhereInput) P() (predicate.Comment, error) {
+	var predicates []predicate.Comment
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, comment.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Comment, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, comment.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Comment, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, comment.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, comment.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, comment.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, comment.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, comment.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, comment.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, comment.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, comment.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, comment.IDLTE(*i.IDLTE))
+	}
+	if i.Content != nil {
+		predicates = append(predicates, comment.ContentEQ(*i.Content))
+	}
+	if i.ContentNEQ != nil {
+		predicates = append(predicates, comment.ContentNEQ(*i.ContentNEQ))
+	}
+	if len(i.ContentIn) > 0 {
+		predicates = append(predicates, comment.ContentIn(i.ContentIn...))
+	}
+	if len(i.ContentNotIn) > 0 {
+		predicates = append(predicates, comment.ContentNotIn(i.ContentNotIn...))
+	}
+	if i.ContentGT != nil {
+		predicates = append(predicates, comment.ContentGT(*i.ContentGT))
+	}
+	if i.ContentGTE != nil {
+		predicates = append(predicates, comment.ContentGTE(*i.ContentGTE))
+	}
+	if i.ContentLT != nil {
+		predicates = append(predicates, comment.ContentLT(*i.ContentLT))
+	}
+	if i.ContentLTE != nil {
+		predicates = append(predicates, comment.ContentLTE(*i.ContentLTE))
+	}
+	if i.ContentContains != nil {
+		predicates = append(predicates, comment.ContentContains(*i.ContentContains))
+	}
+	if i.ContentHasPrefix != nil {
+		predicates = append(predicates, comment.ContentHasPrefix(*i.ContentHasPrefix))
+	}
+	if i.ContentHasSuffix != nil {
+		predicates = append(predicates, comment.ContentHasSuffix(*i.ContentHasSuffix))
+	}
+	if i.ContentEqualFold != nil {
+		predicates = append(predicates, comment.ContentEqualFold(*i.ContentEqualFold))
+	}
+	if i.ContentContainsFold != nil {
+		predicates = append(predicates, comment.ContentContainsFold(*i.ContentContainsFold))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, comment.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, comment.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, comment.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, comment.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, comment.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, comment.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, comment.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, comment.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, comment.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, comment.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, comment.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, comment.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, comment.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, comment.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, comment.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, comment.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.DeletedAt != nil {
+		predicates = append(predicates, comment.DeletedAtEQ(*i.DeletedAt))
+	}
+	if i.DeletedAtNEQ != nil {
+		predicates = append(predicates, comment.DeletedAtNEQ(*i.DeletedAtNEQ))
+	}
+	if i.DeletedAtIsNil {
+		predicates = append(predicates, comment.DeletedAtIsNil())
+	}
+	if i.DeletedAtNotNil {
+		predicates = append(predicates, comment.DeletedAtNotNil())
+	}
+
+	if i.HasAuthor != nil {
+		p := comment.HasAuthor()
+		if !*i.HasAuthor {
+			p = comment.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAuthorWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasAuthorWith))
+		for _, w := range i.HasAuthorWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAuthorWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, comment.HasAuthorWith(with...))
+	}
+	if i.HasPost != nil {
+		p := comment.HasPost()
+		if !*i.HasPost {
+			p = comment.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasPostWith) > 0 {
+		with := make([]predicate.Post, 0, len(i.HasPostWith))
+		for _, w := range i.HasPostWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasPostWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, comment.HasPostWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyCommentWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return comment.And(predicates...), nil
+	}
+}
 
 // NoteWhereInput represents a where input for filtering Note queries.
 type NoteWhereInput struct {
@@ -335,16 +643,6 @@ type PostWhereInput struct {
 	Pinned    *bool `json:"pinned,omitempty"`
 	PinnedNEQ *bool `json:"pinnedNEQ,omitempty"`
 
-	// "user_id" field predicates.
-	UserID      *uuid.UUID  `json:"userID,omitempty"`
-	UserIDNEQ   *uuid.UUID  `json:"userIDNEQ,omitempty"`
-	UserIDIn    []uuid.UUID `json:"userIDIn,omitempty"`
-	UserIDNotIn []uuid.UUID `json:"userIDNotIn,omitempty"`
-	UserIDGT    *uuid.UUID  `json:"userIDGT,omitempty"`
-	UserIDGTE   *uuid.UUID  `json:"userIDGTE,omitempty"`
-	UserIDLT    *uuid.UUID  `json:"userIDLT,omitempty"`
-	UserIDLTE   *uuid.UUID  `json:"userIDLTE,omitempty"`
-
 	// "title" field predicates.
 	Title             *string  `json:"title,omitempty"`
 	TitleNEQ          *string  `json:"titleNEQ,omitempty"`
@@ -438,6 +736,14 @@ type PostWhereInput struct {
 	CategoriesNEQ   *post.Categories  `json:"categoriesNEQ,omitempty"`
 	CategoriesIn    []post.Categories `json:"categoriesIn,omitempty"`
 	CategoriesNotIn []post.Categories `json:"categoriesNotIn,omitempty"`
+
+	// "author" edge predicates.
+	HasAuthor     *bool             `json:"hasAuthor,omitempty"`
+	HasAuthorWith []*UserWhereInput `json:"hasAuthorWith,omitempty"`
+
+	// "comments" edge predicates.
+	HasComments     *bool                `json:"hasComments,omitempty"`
+	HasCommentsWith []*CommentWhereInput `json:"hasCommentsWith,omitempty"`
 
 	// "saved_by" edge predicates.
 	HasSavedBy     *bool             `json:"hasSavedBy,omitempty"`
@@ -548,30 +854,6 @@ func (i *PostWhereInput) P() (predicate.Post, error) {
 	}
 	if i.PinnedNEQ != nil {
 		predicates = append(predicates, post.PinnedNEQ(*i.PinnedNEQ))
-	}
-	if i.UserID != nil {
-		predicates = append(predicates, post.UserIDEQ(*i.UserID))
-	}
-	if i.UserIDNEQ != nil {
-		predicates = append(predicates, post.UserIDNEQ(*i.UserIDNEQ))
-	}
-	if len(i.UserIDIn) > 0 {
-		predicates = append(predicates, post.UserIDIn(i.UserIDIn...))
-	}
-	if len(i.UserIDNotIn) > 0 {
-		predicates = append(predicates, post.UserIDNotIn(i.UserIDNotIn...))
-	}
-	if i.UserIDGT != nil {
-		predicates = append(predicates, post.UserIDGT(*i.UserIDGT))
-	}
-	if i.UserIDGTE != nil {
-		predicates = append(predicates, post.UserIDGTE(*i.UserIDGTE))
-	}
-	if i.UserIDLT != nil {
-		predicates = append(predicates, post.UserIDLT(*i.UserIDLT))
-	}
-	if i.UserIDLTE != nil {
-		predicates = append(predicates, post.UserIDLTE(*i.UserIDLTE))
 	}
 	if i.Title != nil {
 		predicates = append(predicates, post.TitleEQ(*i.Title))
@@ -808,6 +1090,42 @@ func (i *PostWhereInput) P() (predicate.Post, error) {
 		predicates = append(predicates, post.CategoriesNotIn(i.CategoriesNotIn...))
 	}
 
+	if i.HasAuthor != nil {
+		p := post.HasAuthor()
+		if !*i.HasAuthor {
+			p = post.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAuthorWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasAuthorWith))
+		for _, w := range i.HasAuthorWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAuthorWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, post.HasAuthorWith(with...))
+	}
+	if i.HasComments != nil {
+		p := post.HasComments()
+		if !*i.HasComments {
+			p = post.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCommentsWith) > 0 {
+		with := make([]predicate.Comment, 0, len(i.HasCommentsWith))
+		for _, w := range i.HasCommentsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCommentsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, post.HasCommentsWith(with...))
+	}
 	if i.HasSavedBy != nil {
 		p := post.HasSavedBy()
 		if !*i.HasSavedBy {
@@ -963,6 +1281,14 @@ type UserWhereInput struct {
 	// "liked_posts" edge predicates.
 	HasLikedPosts     *bool             `json:"hasLikedPosts,omitempty"`
 	HasLikedPostsWith []*PostWhereInput `json:"hasLikedPostsWith,omitempty"`
+
+	// "posts" edge predicates.
+	HasPosts     *bool             `json:"hasPosts,omitempty"`
+	HasPostsWith []*PostWhereInput `json:"hasPostsWith,omitempty"`
+
+	// "comments" edge predicates.
+	HasComments     *bool                `json:"hasComments,omitempty"`
+	HasCommentsWith []*CommentWhereInput `json:"hasCommentsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1309,6 +1635,42 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, user.HasLikedPostsWith(with...))
+	}
+	if i.HasPosts != nil {
+		p := user.HasPosts()
+		if !*i.HasPosts {
+			p = user.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasPostsWith) > 0 {
+		with := make([]predicate.Post, 0, len(i.HasPostsWith))
+		for _, w := range i.HasPostsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasPostsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, user.HasPostsWith(with...))
+	}
+	if i.HasComments != nil {
+		p := user.HasComments()
+		if !*i.HasComments {
+			p = user.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCommentsWith) > 0 {
+		with := make([]predicate.Comment, 0, len(i.HasCommentsWith))
+		for _, w := range i.HasCommentsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCommentsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, user.HasCommentsWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

@@ -5,10 +5,45 @@ package ent
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/user"
 )
+
+// CreateCommentInput represents a mutation input for creating comments.
+type CreateCommentInput struct {
+	Content   string
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+	DeletedAt *bool
+	AuthorID  *int
+	PostID    *int
+}
+
+// Mutate applies the CreateCommentInput on the CommentMutation builder.
+func (i *CreateCommentInput) Mutate(m *CommentMutation) {
+	m.SetContent(i.Content)
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.DeletedAt; v != nil {
+		m.SetDeletedAt(*v)
+	}
+	if v := i.AuthorID; v != nil {
+		m.SetAuthorID(*v)
+	}
+	if v := i.PostID; v != nil {
+		m.SetPostID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateCommentInput on the CommentCreate builder.
+func (c *CommentCreate) SetInput(i CreateCommentInput) *CommentCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
 
 // CreateNoteInput represents a mutation input for creating notes.
 type CreateNoteInput struct {
@@ -39,7 +74,6 @@ func (c *NoteCreate) SetInput(i CreateNoteInput) *NoteCreate {
 // CreatePostInput represents a mutation input for creating posts.
 type CreatePostInput struct {
 	Pinned            *bool
-	UserID            uuid.UUID
 	Title             string
 	Content           *string
 	Link              string
@@ -48,6 +82,8 @@ type CreatePostInput struct {
 	CreatedAt         *time.Time
 	UpdatedAt         *time.Time
 	Categories        post.Categories
+	AuthorID          *int
+	CommentIDs        []int
 	SavedByIDs        []int
 	LikedByIDs        []int
 }
@@ -57,7 +93,6 @@ func (i *CreatePostInput) Mutate(m *PostMutation) {
 	if v := i.Pinned; v != nil {
 		m.SetPinned(*v)
 	}
-	m.SetUserID(i.UserID)
 	m.SetTitle(i.Title)
 	if v := i.Content; v != nil {
 		m.SetContent(*v)
@@ -76,6 +111,12 @@ func (i *CreatePostInput) Mutate(m *PostMutation) {
 		m.SetUpdatedAt(*v)
 	}
 	m.SetCategories(i.Categories)
+	if v := i.AuthorID; v != nil {
+		m.SetAuthorID(*v)
+	}
+	if v := i.CommentIDs; len(v) > 0 {
+		m.AddCommentIDs(v...)
+	}
 	if v := i.SavedByIDs; len(v) > 0 {
 		m.AddSavedByIDs(v...)
 	}
@@ -102,6 +143,8 @@ type CreateUserInput struct {
 	DeletedAt    *time.Time
 	SavedPostIDs []int
 	LikedPostIDs []int
+	PostIDs      []int
+	CommentIDs   []int
 }
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
@@ -131,6 +174,12 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 	}
 	if v := i.LikedPostIDs; len(v) > 0 {
 		m.AddLikedPostIDs(v...)
+	}
+	if v := i.PostIDs; len(v) > 0 {
+		m.AddPostIDs(v...)
+	}
+	if v := i.CommentIDs; len(v) > 0 {
+		m.AddCommentIDs(v...)
 	}
 }
 

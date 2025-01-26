@@ -8,6 +8,42 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (c *Comment) Author(ctx context.Context) (*User, error) {
+	result, err := c.Edges.AuthorOrErr()
+	if IsNotLoaded(err) {
+		result, err = c.QueryAuthor().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (c *Comment) Post(ctx context.Context) (*Post, error) {
+	result, err := c.Edges.PostOrErr()
+	if IsNotLoaded(err) {
+		result, err = c.QueryPost().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (po *Post) Author(ctx context.Context) (*User, error) {
+	result, err := po.Edges.AuthorOrErr()
+	if IsNotLoaded(err) {
+		result, err = po.QueryAuthor().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (po *Post) Comments(ctx context.Context) (result []*Comment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = po.NamedComments(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = po.Edges.CommentsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = po.QueryComments().All(ctx)
+	}
+	return result, err
+}
+
 func (po *Post) SavedBy(ctx context.Context) (result []*User, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = po.NamedSavedBy(graphql.GetFieldContext(ctx).Field.Alias)
@@ -52,6 +88,30 @@ func (u *User) LikedPosts(ctx context.Context) (result []*Post, err error) {
 	}
 	if IsNotLoaded(err) {
 		result, err = u.QueryLikedPosts().All(ctx)
+	}
+	return result, err
+}
+
+func (u *User) Posts(ctx context.Context) (result []*Post, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = u.NamedPosts(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = u.Edges.PostsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = u.QueryPosts().All(ctx)
+	}
+	return result, err
+}
+
+func (u *User) Comments(ctx context.Context) (result []*Comment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = u.NamedComments(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = u.Edges.CommentsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = u.QueryComments().All(ctx)
 	}
 	return result, err
 }

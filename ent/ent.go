@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/laclipasa/la-clipasa/ent/comment"
 	"github.com/laclipasa/la-clipasa/ent/note"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/user"
@@ -75,9 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			note.Table: note.ValidColumn,
-			post.Table: post.ValidColumn,
-			user.Table: user.ValidColumn,
+			comment.Table: comment.ValidColumn,
+			note.Table:    note.ValidColumn,
+			post.Table:    post.ValidColumn,
+			user.Table:    user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

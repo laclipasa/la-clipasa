@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
+	"github.com/laclipasa/la-clipasa/ent/comment"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/predicate"
 	"github.com/laclipasa/la-clipasa/ent/user"
@@ -40,20 +40,6 @@ func (pu *PostUpdate) SetPinned(b bool) *PostUpdate {
 func (pu *PostUpdate) SetNillablePinned(b *bool) *PostUpdate {
 	if b != nil {
 		pu.SetPinned(*b)
-	}
-	return pu
-}
-
-// SetUserID sets the "user_id" field.
-func (pu *PostUpdate) SetUserID(u uuid.UUID) *PostUpdate {
-	pu.mutation.SetUserID(u)
-	return pu
-}
-
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableUserID(u *uuid.UUID) *PostUpdate {
-	if u != nil {
-		pu.SetUserID(*u)
 	}
 	return pu
 }
@@ -160,6 +146,40 @@ func (pu *PostUpdate) SetNillableCategories(po *post.Categories) *PostUpdate {
 	return pu
 }
 
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (pu *PostUpdate) SetAuthorID(id int) *PostUpdate {
+	pu.mutation.SetAuthorID(id)
+	return pu
+}
+
+// SetNillableAuthorID sets the "author" edge to the User entity by ID if the given value is not nil.
+func (pu *PostUpdate) SetNillableAuthorID(id *int) *PostUpdate {
+	if id != nil {
+		pu = pu.SetAuthorID(*id)
+	}
+	return pu
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (pu *PostUpdate) SetAuthor(u *User) *PostUpdate {
+	return pu.SetAuthorID(u.ID)
+}
+
+// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+func (pu *PostUpdate) AddCommentIDs(ids ...int) *PostUpdate {
+	pu.mutation.AddCommentIDs(ids...)
+	return pu
+}
+
+// AddComments adds the "comments" edges to the Comment entity.
+func (pu *PostUpdate) AddComments(c ...*Comment) *PostUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return pu.AddCommentIDs(ids...)
+}
+
 // AddSavedByIDs adds the "saved_by" edge to the User entity by IDs.
 func (pu *PostUpdate) AddSavedByIDs(ids ...int) *PostUpdate {
 	pu.mutation.AddSavedByIDs(ids...)
@@ -193,6 +213,33 @@ func (pu *PostUpdate) AddLikedBy(u ...*User) *PostUpdate {
 // Mutation returns the PostMutation object of the builder.
 func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
+}
+
+// ClearAuthor clears the "author" edge to the User entity.
+func (pu *PostUpdate) ClearAuthor() *PostUpdate {
+	pu.mutation.ClearAuthor()
+	return pu
+}
+
+// ClearComments clears all "comments" edges to the Comment entity.
+func (pu *PostUpdate) ClearComments() *PostUpdate {
+	pu.mutation.ClearComments()
+	return pu
+}
+
+// RemoveCommentIDs removes the "comments" edge to Comment entities by IDs.
+func (pu *PostUpdate) RemoveCommentIDs(ids ...int) *PostUpdate {
+	pu.mutation.RemoveCommentIDs(ids...)
+	return pu
+}
+
+// RemoveComments removes "comments" edges to Comment entities.
+func (pu *PostUpdate) RemoveComments(c ...*Comment) *PostUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return pu.RemoveCommentIDs(ids...)
 }
 
 // ClearSavedBy clears all "saved_by" edges to the User entity.
@@ -303,9 +350,6 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.Pinned(); ok {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 	}
-	if value, ok := pu.mutation.UserID(); ok {
-		_spec.SetField(post.FieldUserID, field.TypeUUID, value)
-	}
 	if value, ok := pu.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 	}
@@ -332,6 +376,80 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Categories(); ok {
 		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
+	}
+	if pu.mutation.AuthorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.AuthorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.CommentsTable,
+			Columns: []string{post.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedCommentsIDs(); len(nodes) > 0 && !pu.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.CommentsTable,
+			Columns: []string{post.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.CommentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.CommentsTable,
+			Columns: []string{post.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if pu.mutation.SavedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -457,20 +575,6 @@ func (puo *PostUpdateOne) SetNillablePinned(b *bool) *PostUpdateOne {
 	return puo
 }
 
-// SetUserID sets the "user_id" field.
-func (puo *PostUpdateOne) SetUserID(u uuid.UUID) *PostUpdateOne {
-	puo.mutation.SetUserID(u)
-	return puo
-}
-
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableUserID(u *uuid.UUID) *PostUpdateOne {
-	if u != nil {
-		puo.SetUserID(*u)
-	}
-	return puo
-}
-
 // SetTitle sets the "title" field.
 func (puo *PostUpdateOne) SetTitle(s string) *PostUpdateOne {
 	puo.mutation.SetTitle(s)
@@ -573,6 +677,40 @@ func (puo *PostUpdateOne) SetNillableCategories(po *post.Categories) *PostUpdate
 	return puo
 }
 
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (puo *PostUpdateOne) SetAuthorID(id int) *PostUpdateOne {
+	puo.mutation.SetAuthorID(id)
+	return puo
+}
+
+// SetNillableAuthorID sets the "author" edge to the User entity by ID if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableAuthorID(id *int) *PostUpdateOne {
+	if id != nil {
+		puo = puo.SetAuthorID(*id)
+	}
+	return puo
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (puo *PostUpdateOne) SetAuthor(u *User) *PostUpdateOne {
+	return puo.SetAuthorID(u.ID)
+}
+
+// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+func (puo *PostUpdateOne) AddCommentIDs(ids ...int) *PostUpdateOne {
+	puo.mutation.AddCommentIDs(ids...)
+	return puo
+}
+
+// AddComments adds the "comments" edges to the Comment entity.
+func (puo *PostUpdateOne) AddComments(c ...*Comment) *PostUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return puo.AddCommentIDs(ids...)
+}
+
 // AddSavedByIDs adds the "saved_by" edge to the User entity by IDs.
 func (puo *PostUpdateOne) AddSavedByIDs(ids ...int) *PostUpdateOne {
 	puo.mutation.AddSavedByIDs(ids...)
@@ -606,6 +744,33 @@ func (puo *PostUpdateOne) AddLikedBy(u ...*User) *PostUpdateOne {
 // Mutation returns the PostMutation object of the builder.
 func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
+}
+
+// ClearAuthor clears the "author" edge to the User entity.
+func (puo *PostUpdateOne) ClearAuthor() *PostUpdateOne {
+	puo.mutation.ClearAuthor()
+	return puo
+}
+
+// ClearComments clears all "comments" edges to the Comment entity.
+func (puo *PostUpdateOne) ClearComments() *PostUpdateOne {
+	puo.mutation.ClearComments()
+	return puo
+}
+
+// RemoveCommentIDs removes the "comments" edge to Comment entities by IDs.
+func (puo *PostUpdateOne) RemoveCommentIDs(ids ...int) *PostUpdateOne {
+	puo.mutation.RemoveCommentIDs(ids...)
+	return puo
+}
+
+// RemoveComments removes "comments" edges to Comment entities.
+func (puo *PostUpdateOne) RemoveComments(c ...*Comment) *PostUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return puo.RemoveCommentIDs(ids...)
 }
 
 // ClearSavedBy clears all "saved_by" edges to the User entity.
@@ -746,9 +911,6 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	if value, ok := puo.mutation.Pinned(); ok {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 	}
-	if value, ok := puo.mutation.UserID(); ok {
-		_spec.SetField(post.FieldUserID, field.TypeUUID, value)
-	}
 	if value, ok := puo.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 	}
@@ -775,6 +937,80 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if value, ok := puo.mutation.Categories(); ok {
 		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
+	}
+	if puo.mutation.AuthorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.AuthorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.CommentsTable,
+			Columns: []string{post.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedCommentsIDs(); len(nodes) > 0 && !puo.mutation.CommentsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.CommentsTable,
+			Columns: []string{post.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.CommentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.CommentsTable,
+			Columns: []string{post.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if puo.mutation.SavedByCleared() {
 		edge := &sqlgraph.EdgeSpec{

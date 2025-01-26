@@ -19,8 +19,6 @@ const (
 	FieldID = "id"
 	// FieldPinned holds the string denoting the pinned field in the database.
 	FieldPinned = "pinned"
-	// FieldUserID holds the string denoting the user_id field in the database.
-	FieldUserID = "user_id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldContent holds the string denoting the content field in the database.
@@ -37,12 +35,30 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldCategories holds the string denoting the categories field in the database.
 	FieldCategories = "categories"
+	// EdgeAuthor holds the string denoting the author edge name in mutations.
+	EdgeAuthor = "author"
+	// EdgeComments holds the string denoting the comments edge name in mutations.
+	EdgeComments = "comments"
 	// EdgeSavedBy holds the string denoting the saved_by edge name in mutations.
 	EdgeSavedBy = "saved_by"
 	// EdgeLikedBy holds the string denoting the liked_by edge name in mutations.
 	EdgeLikedBy = "liked_by"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
+	// AuthorTable is the table that holds the author relation/edge.
+	AuthorTable = "posts"
+	// AuthorInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	AuthorInverseTable = "users"
+	// AuthorColumn is the table column denoting the author relation/edge.
+	AuthorColumn = "user_posts"
+	// CommentsTable is the table that holds the comments relation/edge.
+	CommentsTable = "comments"
+	// CommentsInverseTable is the table name for the Comment entity.
+	// It exists in this package in order to avoid circular dependency with the "comment" package.
+	CommentsInverseTable = "comments"
+	// CommentsColumn is the table column denoting the comments relation/edge.
+	CommentsColumn = "post_comments"
 	// SavedByTable is the table that holds the saved_by relation/edge. The primary key declared below.
 	SavedByTable = "user_saved_posts"
 	// SavedByInverseTable is the table name for the User entity.
@@ -59,7 +75,6 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldPinned,
-	FieldUserID,
 	FieldTitle,
 	FieldContent,
 	FieldLink,
@@ -68,6 +83,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldCategories,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"user_posts",
 }
 
 var (
@@ -83,6 +104,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -149,11 +175,6 @@ func ByPinned(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPinned, opts...).ToFunc()
 }
 
-// ByUserID orders the results by the user_id field.
-func ByUserID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserID, opts...).ToFunc()
-}
-
 // ByTitle orders the results by the title field.
 func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
@@ -194,6 +215,27 @@ func ByCategories(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategories, opts...).ToFunc()
 }
 
+// ByAuthorField orders the results by author field.
+func ByAuthorField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAuthorStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByCommentsCount orders the results by comments count.
+func ByCommentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCommentsStep(), opts...)
+	}
+}
+
+// ByComments orders the results by comments terms.
+func ByComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCommentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // BySavedByCount orders the results by saved_by count.
 func BySavedByCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -220,6 +262,20 @@ func ByLikedBy(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newLikedByStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newAuthorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AuthorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, AuthorTable, AuthorColumn),
+	)
+}
+func newCommentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CommentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CommentsTable, CommentsColumn),
+	)
 }
 func newSavedByStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

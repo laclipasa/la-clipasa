@@ -43,11 +43,10 @@ func (User) Fields() []ent.Field {
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		// Many-to-many relationship with Post for saved posts.
 		edge.To("saved_posts", Post.Type),
-
-		// Many-to-many relationship with Post for liked posts.
 		edge.To("liked_posts", Post.Type),
+		edge.To("posts", Post.Type),
+		edge.To("comments", Comment.Type),
 	}
 }
 

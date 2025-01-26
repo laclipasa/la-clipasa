@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/google/uuid"
 	"github.com/laclipasa/la-clipasa/ent/post"
+	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // Post is the model entity for the Post schema.
@@ -20,8 +20,6 @@ type Post struct {
 	ID int `json:"id,omitempty"`
 	// Pinned holds the value of the "pinned" field.
 	Pinned bool `json:"pinned,omitempty"`
-	// UserID holds the value of the "user_id" field.
-	UserID uuid.UUID `json:"user_id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Content holds the value of the "content" field.
@@ -41,29 +39,55 @@ type Post struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges        PostEdges `json:"edges"`
+	user_posts   *int
 	selectValues sql.SelectValues
 }
 
 // PostEdges holds the relations/edges for other nodes in the graph.
 type PostEdges struct {
+	// Author holds the value of the author edge.
+	Author *User `json:"author,omitempty"`
+	// Comments holds the value of the comments edge.
+	Comments []*Comment `json:"comments,omitempty"`
 	// SavedBy holds the value of the saved_by edge.
 	SavedBy []*User `json:"saved_by,omitempty"`
 	// LikedBy holds the value of the liked_by edge.
 	LikedBy []*User `json:"liked_by,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [4]map[string]int
 
-	namedSavedBy map[string][]*User
-	namedLikedBy map[string][]*User
+	namedComments map[string][]*Comment
+	namedSavedBy  map[string][]*User
+	namedLikedBy  map[string][]*User
+}
+
+// AuthorOrErr returns the Author value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PostEdges) AuthorOrErr() (*User, error) {
+	if e.Author != nil {
+		return e.Author, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "author"}
+}
+
+// CommentsOrErr returns the Comments value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) CommentsOrErr() ([]*Comment, error) {
+	if e.loadedTypes[1] {
+		return e.Comments, nil
+	}
+	return nil, &NotLoadedError{edge: "comments"}
 }
 
 // SavedByOrErr returns the SavedBy value or an error if the edge
 // was not loaded in eager-loading.
 func (e PostEdges) SavedByOrErr() ([]*User, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[2] {
 		return e.SavedBy, nil
 	}
 	return nil, &NotLoadedError{edge: "saved_by"}
@@ -72,7 +96,7 @@ func (e PostEdges) SavedByOrErr() ([]*User, error) {
 // LikedByOrErr returns the LikedBy value or an error if the edge
 // was not loaded in eager-loading.
 func (e PostEdges) LikedByOrErr() ([]*User, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[3] {
 		return e.LikedBy, nil
 	}
 	return nil, &NotLoadedError{edge: "liked_by"}
@@ -91,8 +115,8 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case post.FieldUserID:
-			values[i] = new(uuid.UUID)
+		case post.ForeignKeys[0]: // user_posts
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -119,12 +143,6 @@ func (po *Post) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field pinned", values[i])
 			} else if value.Valid {
 				po.Pinned = value.Bool
-			}
-		case post.FieldUserID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field user_id", values[i])
-			} else if value != nil {
-				po.UserID = *value
 			}
 		case post.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -175,6 +193,13 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				po.Categories = post.Categories(value.String)
 			}
+		case post.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field user_posts", value)
+			} else if value.Valid {
+				po.user_posts = new(int)
+				*po.user_posts = int(value.Int64)
+			}
 		default:
 			po.selectValues.Set(columns[i], values[i])
 		}
@@ -186,6 +211,16 @@ func (po *Post) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (po *Post) Value(name string) (ent.Value, error) {
 	return po.selectValues.Get(name)
+}
+
+// QueryAuthor queries the "author" edge of the Post entity.
+func (po *Post) QueryAuthor() *UserQuery {
+	return NewPostClient(po.config).QueryAuthor(po)
+}
+
+// QueryComments queries the "comments" edge of the Post entity.
+func (po *Post) QueryComments() *CommentQuery {
+	return NewPostClient(po.config).QueryComments(po)
 }
 
 // QuerySavedBy queries the "saved_by" edge of the Post entity.
@@ -224,9 +259,6 @@ func (po *Post) String() string {
 	builder.WriteString("pinned=")
 	builder.WriteString(fmt.Sprintf("%v", po.Pinned))
 	builder.WriteString(", ")
-	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", po.UserID))
-	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(po.Title)
 	builder.WriteString(", ")
@@ -254,6 +286,30 @@ func (po *Post) String() string {
 	builder.WriteString(fmt.Sprintf("%v", po.Categories))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedComments returns the Comments named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (po *Post) NamedComments(name string) ([]*Comment, error) {
+	if po.Edges.namedComments == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := po.Edges.namedComments[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (po *Post) appendNamedComments(name string, edges ...*Comment) {
+	if po.Edges.namedComments == nil {
+		po.Edges.namedComments = make(map[string][]*Comment)
+	}
+	if len(edges) == 0 {
+		po.Edges.namedComments[name] = []*Comment{}
+	} else {
+		po.Edges.namedComments[name] = append(po.Edges.namedComments[name], edges...)
+	}
 }
 
 // NamedSavedBy returns the SavedBy named value or an error if the edge was not

@@ -1,19 +1,5 @@
 
 
-type Note implements Node {
-  id: Int!
-  nodeId: ID!
-
-  title: String!
-  # extra resolvers for the Note type will be required if its not a schema property
-  # helps us to split the application model from the database model and allows us to hide
-  # database fields from the API as well as adding additional fields that can be resolved from the database model.
-  bodyMarkdown: String!
-  bodyHtml: String!
-
-  createdAt: Time!
-  updatedAt: Time!
-}
 
 type NoteConnection {
   edges: [NoteEdge]
@@ -32,8 +18,7 @@ input NoteInput {
 }
 
 extend type Query {
-  notes(after: Cursor, first: Int, before: Cursor, last: Int): NoteConnection!
-  node(nodeId: ID!) : Node
+  paginatedNotes(after: Cursor, first: Int, before: Cursor, last: Int): NoteConnection!
 }
 
 

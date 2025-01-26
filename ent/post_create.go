@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/google/uuid"
+	"github.com/laclipasa/la-clipasa/ent/comment"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/user"
 )
@@ -33,12 +33,6 @@ func (pc *PostCreate) SetNillablePinned(b *bool) *PostCreate {
 	if b != nil {
 		pc.SetPinned(*b)
 	}
-	return pc
-}
-
-// SetUserID sets the "user_id" field.
-func (pc *PostCreate) SetUserID(u uuid.UUID) *PostCreate {
-	pc.mutation.SetUserID(u)
 	return pc
 }
 
@@ -130,6 +124,40 @@ func (pc *PostCreate) SetCategories(po post.Categories) *PostCreate {
 	return pc
 }
 
+// SetAuthorID sets the "author" edge to the User entity by ID.
+func (pc *PostCreate) SetAuthorID(id int) *PostCreate {
+	pc.mutation.SetAuthorID(id)
+	return pc
+}
+
+// SetNillableAuthorID sets the "author" edge to the User entity by ID if the given value is not nil.
+func (pc *PostCreate) SetNillableAuthorID(id *int) *PostCreate {
+	if id != nil {
+		pc = pc.SetAuthorID(*id)
+	}
+	return pc
+}
+
+// SetAuthor sets the "author" edge to the User entity.
+func (pc *PostCreate) SetAuthor(u *User) *PostCreate {
+	return pc.SetAuthorID(u.ID)
+}
+
+// AddCommentIDs adds the "comments" edge to the Comment entity by IDs.
+func (pc *PostCreate) AddCommentIDs(ids ...int) *PostCreate {
+	pc.mutation.AddCommentIDs(ids...)
+	return pc
+}
+
+// AddComments adds the "comments" edges to the Comment entity.
+func (pc *PostCreate) AddComments(c ...*Comment) *PostCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return pc.AddCommentIDs(ids...)
+}
+
 // AddSavedByIDs adds the "saved_by" edge to the User entity by IDs.
 func (pc *PostCreate) AddSavedByIDs(ids ...int) *PostCreate {
 	pc.mutation.AddSavedByIDs(ids...)
@@ -218,9 +246,6 @@ func (pc *PostCreate) check() error {
 	if _, ok := pc.mutation.Pinned(); !ok {
 		return &ValidationError{Name: "pinned", err: errors.New(`ent: missing required field "Post.pinned"`)}
 	}
-	if _, ok := pc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Post.user_id"`)}
-	}
 	if _, ok := pc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Post.title"`)}
 	}
@@ -279,10 +304,6 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 		_node.Pinned = value
 	}
-	if value, ok := pc.mutation.UserID(); ok {
-		_spec.SetField(post.FieldUserID, field.TypeUUID, value)
-		_node.UserID = value
-	}
 	if value, ok := pc.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -314,6 +335,39 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Categories(); ok {
 		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
 		_node.Categories = value
+	}
+	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   post.AuthorTable,
+			Columns: []string{post.AuthorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_posts = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.CommentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.CommentsTable,
+			Columns: []string{post.CommentsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(comment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.SavedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

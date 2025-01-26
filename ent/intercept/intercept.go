@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/laclipasa/la-clipasa/ent"
+	"github.com/laclipasa/la-clipasa/ent/comment"
 	"github.com/laclipasa/la-clipasa/ent/note"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/predicate"
@@ -68,6 +69,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 		return err
 	}
 	return f(ctx, query)
+}
+
+// The CommentFunc type is an adapter to allow the use of ordinary function as a Querier.
+type CommentFunc func(context.Context, *ent.CommentQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f CommentFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.CommentQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.CommentQuery", q)
+}
+
+// The TraverseComment type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseComment func(context.Context, *ent.CommentQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseComment) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseComment) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.CommentQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.CommentQuery", q)
 }
 
 // The NoteFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -154,6 +182,8 @@ func (f TraverseUser) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.CommentQuery:
+		return &query[*ent.CommentQuery, predicate.Comment, comment.OrderOption]{typ: ent.TypeComment, tq: q}, nil
 	case *ent.NoteQuery:
 		return &query[*ent.NoteQuery, predicate.Note, note.OrderOption]{typ: ent.TypeNote, tq: q}, nil
 	case *ent.PostQuery:

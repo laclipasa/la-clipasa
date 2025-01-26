@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
+	"github.com/laclipasa/la-clipasa/ent/comment"
 	"github.com/laclipasa/la-clipasa/ent/note"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/user"
@@ -98,6 +99,255 @@ func paginateLimit(first, last *int) int {
 		limit = *last + 1
 	}
 	return limit
+}
+
+// CommentEdge is the edge representation of Comment.
+type CommentEdge struct {
+	Node   *Comment `json:"node"`
+	Cursor Cursor   `json:"cursor"`
+}
+
+// CommentConnection is the connection containing edges to Comment.
+type CommentConnection struct {
+	Edges      []*CommentEdge `json:"edges"`
+	PageInfo   PageInfo       `json:"pageInfo"`
+	TotalCount int            `json:"totalCount"`
+}
+
+func (c *CommentConnection) build(nodes []*Comment, pager *commentPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Comment
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Comment {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Comment {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*CommentEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &CommentEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// CommentPaginateOption enables pagination customization.
+type CommentPaginateOption func(*commentPager) error
+
+// WithCommentOrder configures pagination ordering.
+func WithCommentOrder(order *CommentOrder) CommentPaginateOption {
+	if order == nil {
+		order = DefaultCommentOrder
+	}
+	o := *order
+	return func(pager *commentPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCommentOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCommentFilter configures pagination filter.
+func WithCommentFilter(filter func(*CommentQuery) (*CommentQuery, error)) CommentPaginateOption {
+	return func(pager *commentPager) error {
+		if filter == nil {
+			return errors.New("CommentQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type commentPager struct {
+	reverse bool
+	order   *CommentOrder
+	filter  func(*CommentQuery) (*CommentQuery, error)
+}
+
+func newCommentPager(opts []CommentPaginateOption, reverse bool) (*commentPager, error) {
+	pager := &commentPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCommentOrder
+	}
+	return pager, nil
+}
+
+func (p *commentPager) applyFilter(query *CommentQuery) (*CommentQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *commentPager) toCursor(c *Comment) Cursor {
+	return p.order.Field.toCursor(c)
+}
+
+func (p *commentPager) applyCursors(query *CommentQuery, after, before *Cursor) (*CommentQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultCommentOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *commentPager) applyOrder(query *CommentQuery) *CommentQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultCommentOrder.Field {
+		query = query.Order(DefaultCommentOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *commentPager) orderExpr(query *CommentQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultCommentOrder.Field {
+			b.Comma().Ident(DefaultCommentOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Comment.
+func (c *CommentQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CommentPaginateOption,
+) (*CommentConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCommentPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if c, err = pager.applyFilter(c); err != nil {
+		return nil, err
+	}
+	conn := &CommentConnection{Edges: []*CommentEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := c.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if c, err = pager.applyCursors(c, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		c.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := c.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	c = pager.applyOrder(c)
+	nodes, err := c.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// CommentOrderField defines the ordering field of Comment.
+type CommentOrderField struct {
+	// Value extracts the ordering value from the given Comment.
+	Value    func(*Comment) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) comment.OrderOption
+	toCursor func(*Comment) Cursor
+}
+
+// CommentOrder defines the ordering of Comment.
+type CommentOrder struct {
+	Direction OrderDirection     `json:"direction"`
+	Field     *CommentOrderField `json:"field"`
+}
+
+// DefaultCommentOrder is the default ordering of Comment.
+var DefaultCommentOrder = &CommentOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &CommentOrderField{
+		Value: func(c *Comment) (ent.Value, error) {
+			return c.ID, nil
+		},
+		column: comment.FieldID,
+		toTerm: comment.ByID,
+		toCursor: func(c *Comment) Cursor {
+			return Cursor{ID: c.ID}
+		},
+	},
+}
+
+// ToEdge converts Comment into CommentEdge.
+func (c *Comment) ToEdge(order *CommentOrder) *CommentEdge {
+	if order == nil {
+		order = DefaultCommentOrder
+	}
+	return &CommentEdge{
+		Node:   c,
+		Cursor: order.Field.toCursor(c),
+	}
 }
 
 // NoteEdge is the edge representation of Note.

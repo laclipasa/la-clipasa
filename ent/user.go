@@ -46,14 +46,20 @@ type UserEdges struct {
 	SavedPosts []*Post `json:"saved_posts,omitempty"`
 	// LikedPosts holds the value of the liked_posts edge.
 	LikedPosts []*Post `json:"liked_posts,omitempty"`
+	// Posts holds the value of the posts edge.
+	Posts []*Post `json:"posts,omitempty"`
+	// Comments holds the value of the comments edge.
+	Comments []*Comment `json:"comments,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [4]map[string]int
 
 	namedSavedPosts map[string][]*Post
 	namedLikedPosts map[string][]*Post
+	namedPosts      map[string][]*Post
+	namedComments   map[string][]*Comment
 }
 
 // SavedPostsOrErr returns the SavedPosts value or an error if the edge
@@ -72,6 +78,24 @@ func (e UserEdges) LikedPostsOrErr() ([]*Post, error) {
 		return e.LikedPosts, nil
 	}
 	return nil, &NotLoadedError{edge: "liked_posts"}
+}
+
+// PostsOrErr returns the Posts value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) PostsOrErr() ([]*Post, error) {
+	if e.loadedTypes[2] {
+		return e.Posts, nil
+	}
+	return nil, &NotLoadedError{edge: "posts"}
+}
+
+// CommentsOrErr returns the Comments value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) CommentsOrErr() ([]*Comment, error) {
+	if e.loadedTypes[3] {
+		return e.Comments, nil
+	}
+	return nil, &NotLoadedError{edge: "comments"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -183,6 +207,16 @@ func (u *User) QueryLikedPosts() *PostQuery {
 	return NewUserClient(u.config).QueryLikedPosts(u)
 }
 
+// QueryPosts queries the "posts" edge of the User entity.
+func (u *User) QueryPosts() *PostQuery {
+	return NewUserClient(u.config).QueryPosts(u)
+}
+
+// QueryComments queries the "comments" edge of the User entity.
+func (u *User) QueryComments() *CommentQuery {
+	return NewUserClient(u.config).QueryComments(u)
+}
+
 // Update returns a builder for updating this User.
 // Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -282,6 +316,54 @@ func (u *User) appendNamedLikedPosts(name string, edges ...*Post) {
 		u.Edges.namedLikedPosts[name] = []*Post{}
 	} else {
 		u.Edges.namedLikedPosts[name] = append(u.Edges.namedLikedPosts[name], edges...)
+	}
+}
+
+// NamedPosts returns the Posts named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedPosts(name string) ([]*Post, error) {
+	if u.Edges.namedPosts == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedPosts[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedPosts(name string, edges ...*Post) {
+	if u.Edges.namedPosts == nil {
+		u.Edges.namedPosts = make(map[string][]*Post)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedPosts[name] = []*Post{}
+	} else {
+		u.Edges.namedPosts[name] = append(u.Edges.namedPosts[name], edges...)
+	}
+}
+
+// NamedComments returns the Comments named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedComments(name string) ([]*Comment, error) {
+	if u.Edges.namedComments == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedComments[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedComments(name string, edges ...*Comment) {
+	if u.Edges.namedComments == nil {
+		u.Edges.namedComments = make(map[string][]*Comment)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedComments[name] = []*Comment{}
+	} else {
+		u.Edges.namedComments[name] = append(u.Edges.namedComments[name], edges...)
 	}
 }
 

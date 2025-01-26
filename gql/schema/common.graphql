@@ -1,0 +1,5 @@
+scalar Time
+
+type Mutation {
+  _m: Boolean
+}

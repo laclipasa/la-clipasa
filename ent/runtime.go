@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/laclipasa/la-clipasa/ent/comment"
 	"github.com/laclipasa/la-clipasa/ent/note"
 	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/schema"
@@ -15,6 +16,22 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	commentFields := schema.Comment{}.Fields()
+	_ = commentFields
+	// commentDescContent is the schema descriptor for content field.
+	commentDescContent := commentFields[0].Descriptor()
+	// comment.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	comment.ContentValidator = commentDescContent.Validators[0].(func(string) error)
+	// commentDescCreatedAt is the schema descriptor for created_at field.
+	commentDescCreatedAt := commentFields[1].Descriptor()
+	// comment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	comment.DefaultCreatedAt = commentDescCreatedAt.Default.(func() time.Time)
+	// commentDescUpdatedAt is the schema descriptor for updated_at field.
+	commentDescUpdatedAt := commentFields[2].Descriptor()
+	// comment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	comment.DefaultUpdatedAt = commentDescUpdatedAt.Default.(func() time.Time)
+	// comment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	comment.UpdateDefaultUpdatedAt = commentDescUpdatedAt.UpdateDefault.(func() time.Time)
 	noteFields := schema.Note{}.Fields()
 	_ = noteFields
 	// noteDescTitle is the schema descriptor for title field.
@@ -38,19 +55,19 @@ func init() {
 	// post.DefaultPinned holds the default value on creation for the pinned field.
 	post.DefaultPinned = postDescPinned.Default.(bool)
 	// postDescLink is the schema descriptor for link field.
-	postDescLink := postFields[4].Descriptor()
+	postDescLink := postFields[3].Descriptor()
 	// post.LinkValidator is a validator for the "link" field. It is called by the builders before save.
 	post.LinkValidator = postDescLink.Validators[0].(func(string) error)
 	// postDescIsModerated is the schema descriptor for is_moderated field.
-	postDescIsModerated := postFields[6].Descriptor()
+	postDescIsModerated := postFields[5].Descriptor()
 	// post.DefaultIsModerated holds the default value on creation for the is_moderated field.
 	post.DefaultIsModerated = postDescIsModerated.Default.(bool)
 	// postDescCreatedAt is the schema descriptor for created_at field.
-	postDescCreatedAt := postFields[7].Descriptor()
+	postDescCreatedAt := postFields[6].Descriptor()
 	// post.DefaultCreatedAt holds the default value on creation for the created_at field.
 	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
 	// postDescUpdatedAt is the schema descriptor for updated_at field.
-	postDescUpdatedAt := postFields[8].Descriptor()
+	postDescUpdatedAt := postFields[7].Descriptor()
 	// post.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	post.DefaultUpdatedAt = postDescUpdatedAt.Default.(func() time.Time)
 	// post.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

@@ -1063,7 +1063,7 @@ x.migrate.create() {
     tmp="${tmp// /_}"
     name="${tmp,,}"
     test -z $name && err "Please provide a migration name"
-    x.migrate create -ext sql -dir $MIGRATIONS_DIR/ -seq -digits 7 "$name"
+    x.migrate create -ext sql -dir $MIGRATIONS_DIR/ "$name"
   } 2>&4 | xlog >&3; } 4>&1 | xerr >&3; } 3>&1
 }
 
