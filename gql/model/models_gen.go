@@ -2,6 +2,16 @@
 
 package model
 
+import (
+	"github.com/laclipasa/la-clipasa/ent"
+	"github.com/laclipasa/la-clipasa/ent/user"
+)
+
+type AdminUpdateUserInput struct {
+	BaseInput *ent.UpdateUserInput `json:"baseInput"`
+	Role      user.Role            `json:"role"`
+}
+
 type NoteInput struct {
 	Title      string `json:"title"`
 	Body       string `json:"body"`

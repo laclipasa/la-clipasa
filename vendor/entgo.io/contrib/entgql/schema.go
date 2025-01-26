@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"reflect"
+	"slices"
 	"strings"
 
 	"entgo.io/ent/entc/gen"
@@ -586,6 +587,14 @@ func (e *schemaGenerator) buildMutationInputs(t *gen.Type, ant *Annotation, gqlT
 			if err != nil {
 				return nil, err
 			}
+			var dd []Directive
+			for _, d := range ant.Directives {
+				if slices.Contains(d.Skip, SkipDirectiveFieldInput) {
+					continue
+				}
+				dd = append(dd, d)
+			}
+
 			scalar := e.mapScalar(gqlType, f.Field, ant, inputObjectFilter)
 			if scalar == "" {
 				return nil, fmt.Errorf("%s is not supported as input for %s", f.Name, def.Name)
@@ -594,6 +603,7 @@ func (e *schemaGenerator) buildMutationInputs(t *gen.Type, ant *Annotation, gqlT
 				Name:        camel(f.Name),
 				Type:        namedType(scalar, f.Nullable),
 				Description: f.Comment(),
+				Directives:  e.buildDirectives(dd),
 			})
 			if f.AppendOp {
 				def.Fields = append(def.Fields, &ast.FieldDefinition{
@@ -657,12 +667,19 @@ func (e *schemaGenerator) fieldDefinitions(gqlType string, f *gen.Field, ant *An
 	if err != nil {
 		return nil, err
 	}
+	var dd []Directive
+	for _, d := range ant.Directives {
+		if slices.Contains(d.Skip, SkipDirectiveField) {
+			continue
+		}
+		dd = append(dd, d)
+	}
 	for _, name := range mapping {
 		def := &ast.FieldDefinition{
 			Name:        name,
 			Type:        ft,
 			Description: f.Comment(),
-			Directives:  e.buildDirectives(ant.Directives),
+			Directives:  e.buildDirectives(dd),
 		}
 		// We check the field name with gqlgen's naming convention.
 		// To avoid unnecessary @goField directives

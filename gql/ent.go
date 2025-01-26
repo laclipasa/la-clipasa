@@ -35,7 +35,7 @@ func (r *queryResolver) Posts(ctx context.Context, after *entgql.Cursor[int], fi
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.UserWhereInput) (*ent.UserConnection, error) {
-	panic(fmt.Errorf("not implemented: Users - users"))
+	return r.ent.User.Query().Paginate(ctx, after, first, before, last)
 }
 
 // Note returns NoteResolver implementation.

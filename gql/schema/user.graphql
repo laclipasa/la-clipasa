@@ -1,0 +1,19 @@
+
+extend type Query {
+  paginatedUsers(after: Cursor, first: Int, before: Cursor, last: Int): UserConnection!
+}
+
+input AdminUpdateUserInput {
+  baseInput: UpdateUserInput!
+  role: UserRole!
+}
+
+extend type Mutation {
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: Int!, input: UpdateUserInput!): User!
+  # alternative: all fields public and resolver internally verifies if op is allowed
+  # based on input.
+  # alternative: set directive at the field level in ent schema.
+  adminUpdateUser(id: Int!, input: AdminUpdateUserInput!): User!
+  deleteUser(id: Int!): Boolean!
+}

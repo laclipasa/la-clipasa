@@ -668,6 +668,7 @@ linters-settings:
   exhaustruct:
     # lint struct usage in all packages that use them
     include:
+      - 'github\.com/laclipasa/la-clipasa/gql\.DirectiveRoot$'
       - 'github\.com/laclipasa/la-clipasa/internal/rest\.DemoWorkItems$'
       # internal/rest may need to run this, alongside all services structs
       - 'github\.com/laclipasa/la-clipasa/internal/repos/postgresql/gen/models\..*'

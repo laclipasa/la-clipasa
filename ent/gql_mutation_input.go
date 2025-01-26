@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/laclipasa/la-clipasa/ent/post"
+	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // CreateCommentInput represents a mutation input for creating comments.
@@ -327,6 +328,7 @@ type CreateUserInput struct {
 	DisplayName  string
 	ProfileImage *string
 	TwitchID     string
+	Role         *user.Role
 	Awards       []string
 	CreatedAt    *time.Time
 	UpdatedAt    *time.Time
@@ -344,6 +346,9 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 		m.SetProfileImage(*v)
 	}
 	m.SetTwitchID(i.TwitchID)
+	if v := i.Role; v != nil {
+		m.SetRole(*v)
+	}
 	if v := i.Awards; v != nil {
 		m.SetAwards(v)
 	}
@@ -382,6 +387,7 @@ type UpdateUserInput struct {
 	ClearProfileImage  bool
 	ProfileImage       *string
 	TwitchID           *string
+	Role               *user.Role
 	ClearAwards        bool
 	Awards             []string
 	AppendAwards       []string
@@ -415,6 +421,9 @@ func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	}
 	if v := i.TwitchID; v != nil {
 		m.SetTwitchID(*v)
+	}
+	if v := i.Role; v != nil {
+		m.SetRole(*v)
 	}
 	if i.ClearAwards {
 		m.ClearAwards()

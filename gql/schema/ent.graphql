@@ -163,6 +163,7 @@ input CreateUserInput {
   displayName: String!
   profileImage: String
   twitchID: String!
+  role: UserRole @hasRole(role: ADMIN)
   awards: [String!]
   createdAt: Time
   updatedAt: Time
@@ -752,6 +753,7 @@ input UpdateUserInput {
   profileImage: String
   clearProfileImage: Boolean
   twitchID: String
+  role: UserRole @hasRole(role: ADMIN)
   awards: [String!]
   appendAwards: [String!]
   clearAwards: Boolean
