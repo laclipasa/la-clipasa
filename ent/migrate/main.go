@@ -38,9 +38,10 @@ func main() {
 	}
 	// Migrate diff options.
 	opts := []schema.MigrateOption{
-		schema.WithDir(dir),                         // provide migration directory
-		schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
-		schema.WithDialect(dialect.Postgres),        // Ent dialect to use
+		schema.WithDir(dir), // provide migration directory
+		// schema.WithMigrationMode(schema.ModeReplay),
+		schema.WithMigrationMode(schema.ModeInspect), // provide migration mode
+		schema.WithDialect(dialect.Postgres),         // Ent dialect to use
 	}
 	if len(os.Args) != 2 {
 		log.Fatalln("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>'")

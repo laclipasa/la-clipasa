@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/laclipasa/la-clipasa/ent/note"
+	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/schema"
+	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -29,4 +31,40 @@ func init() {
 	note.DefaultUpdatedAt = noteDescUpdatedAt.Default.(func() time.Time)
 	// note.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
 	note.UpdateDefaultUpdatedAt = noteDescUpdatedAt.UpdateDefault.(func() time.Time)
+	postFields := schema.Post{}.Fields()
+	_ = postFields
+	// postDescPinned is the schema descriptor for pinned field.
+	postDescPinned := postFields[0].Descriptor()
+	// post.DefaultPinned holds the default value on creation for the pinned field.
+	post.DefaultPinned = postDescPinned.Default.(bool)
+	// postDescLink is the schema descriptor for link field.
+	postDescLink := postFields[4].Descriptor()
+	// post.LinkValidator is a validator for the "link" field. It is called by the builders before save.
+	post.LinkValidator = postDescLink.Validators[0].(func(string) error)
+	// postDescIsModerated is the schema descriptor for is_moderated field.
+	postDescIsModerated := postFields[6].Descriptor()
+	// post.DefaultIsModerated holds the default value on creation for the is_moderated field.
+	post.DefaultIsModerated = postDescIsModerated.Default.(bool)
+	// postDescCreatedAt is the schema descriptor for created_at field.
+	postDescCreatedAt := postFields[7].Descriptor()
+	// post.DefaultCreatedAt holds the default value on creation for the created_at field.
+	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
+	// postDescUpdatedAt is the schema descriptor for updated_at field.
+	postDescUpdatedAt := postFields[8].Descriptor()
+	// post.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	post.DefaultUpdatedAt = postDescUpdatedAt.Default.(func() time.Time)
+	// post.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	post.UpdateDefaultUpdatedAt = postDescUpdatedAt.UpdateDefault.(func() time.Time)
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[5].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUpdatedAt is the schema descriptor for updated_at field.
+	userDescUpdatedAt := userFields[6].Descriptor()
+	// user.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
+	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

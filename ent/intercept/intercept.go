@@ -9,7 +9,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/laclipasa/la-clipasa/ent"
 	"github.com/laclipasa/la-clipasa/ent/note"
+	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/predicate"
+	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // The Query interface represents an operation that queries a graph.
@@ -95,11 +97,69 @@ func (f TraverseNote) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.NoteQuery", q)
 }
 
+// The PostFunc type is an adapter to allow the use of ordinary function as a Querier.
+type PostFunc func(context.Context, *ent.PostQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f PostFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.PostQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.PostQuery", q)
+}
+
+// The TraversePost type is an adapter to allow the use of ordinary function as Traverser.
+type TraversePost func(context.Context, *ent.PostQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraversePost) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraversePost) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PostQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.PostQuery", q)
+}
+
+// The UserFunc type is an adapter to allow the use of ordinary function as a Querier.
+type UserFunc func(context.Context, *ent.UserQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f UserFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.UserQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.UserQuery", q)
+}
+
+// The TraverseUser type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseUser func(context.Context, *ent.UserQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseUser) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseUser) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.UserQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.UserQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.NoteQuery:
 		return &query[*ent.NoteQuery, predicate.Note, note.OrderOption]{typ: ent.TypeNote, tq: q}, nil
+	case *ent.PostQuery:
+		return &query[*ent.PostQuery, predicate.Post, post.OrderOption]{typ: ent.TypePost, tq: q}, nil
+	case *ent.UserQuery:
+		return &query[*ent.UserQuery, predicate.User, user.OrderOption]{typ: ent.TypeUser, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

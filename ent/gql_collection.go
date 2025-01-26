@@ -8,6 +8,8 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/laclipasa/la-clipasa/ent/note"
+	"github.com/laclipasa/la-clipasa/ent/post"
+	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -110,6 +112,272 @@ func newNotePaginateArgs(rv map[string]any) *notePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*NoteWhereInput); ok {
 		args.opts = append(args.opts, WithNoteFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (po *PostQuery) CollectFields(ctx context.Context, satisfies ...string) (*PostQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return po, nil
+	}
+	if err := po.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return po, nil
+}
+
+func (po *PostQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(post.Columns))
+		selectedFields = []string{post.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "savedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: po.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			po.WithNamedSavedBy(alias, func(wq *UserQuery) {
+				*wq = *query
+			})
+
+		case "likedBy":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: po.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			po.WithNamedLikedBy(alias, func(wq *UserQuery) {
+				*wq = *query
+			})
+		case "pinned":
+			if _, ok := fieldSeen[post.FieldPinned]; !ok {
+				selectedFields = append(selectedFields, post.FieldPinned)
+				fieldSeen[post.FieldPinned] = struct{}{}
+			}
+		case "userID":
+			if _, ok := fieldSeen[post.FieldUserID]; !ok {
+				selectedFields = append(selectedFields, post.FieldUserID)
+				fieldSeen[post.FieldUserID] = struct{}{}
+			}
+		case "title":
+			if _, ok := fieldSeen[post.FieldTitle]; !ok {
+				selectedFields = append(selectedFields, post.FieldTitle)
+				fieldSeen[post.FieldTitle] = struct{}{}
+			}
+		case "content":
+			if _, ok := fieldSeen[post.FieldContent]; !ok {
+				selectedFields = append(selectedFields, post.FieldContent)
+				fieldSeen[post.FieldContent] = struct{}{}
+			}
+		case "link":
+			if _, ok := fieldSeen[post.FieldLink]; !ok {
+				selectedFields = append(selectedFields, post.FieldLink)
+				fieldSeen[post.FieldLink] = struct{}{}
+			}
+		case "moderationComment":
+			if _, ok := fieldSeen[post.FieldModerationComment]; !ok {
+				selectedFields = append(selectedFields, post.FieldModerationComment)
+				fieldSeen[post.FieldModerationComment] = struct{}{}
+			}
+		case "isModerated":
+			if _, ok := fieldSeen[post.FieldIsModerated]; !ok {
+				selectedFields = append(selectedFields, post.FieldIsModerated)
+				fieldSeen[post.FieldIsModerated] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[post.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, post.FieldCreatedAt)
+				fieldSeen[post.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[post.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, post.FieldUpdatedAt)
+				fieldSeen[post.FieldUpdatedAt] = struct{}{}
+			}
+		case "categories":
+			if _, ok := fieldSeen[post.FieldCategories]; !ok {
+				selectedFields = append(selectedFields, post.FieldCategories)
+				fieldSeen[post.FieldCategories] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		po.Select(selectedFields...)
+	}
+	return nil
+}
+
+type postPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []PostPaginateOption
+}
+
+func newPostPaginateArgs(rv map[string]any) *postPaginateArgs {
+	args := &postPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*PostWhereInput); ok {
+		args.opts = append(args.opts, WithPostFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) (*UserQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return u, nil
+	}
+	if err := u.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(user.Columns))
+		selectedFields = []string{user.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+
+		case "savedPosts":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&PostClient{config: u.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, postImplementors)...); err != nil {
+				return err
+			}
+			u.WithNamedSavedPosts(alias, func(wq *PostQuery) {
+				*wq = *query
+			})
+
+		case "likedPosts":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&PostClient{config: u.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, postImplementors)...); err != nil {
+				return err
+			}
+			u.WithNamedLikedPosts(alias, func(wq *PostQuery) {
+				*wq = *query
+			})
+		case "displayName":
+			if _, ok := fieldSeen[user.FieldDisplayName]; !ok {
+				selectedFields = append(selectedFields, user.FieldDisplayName)
+				fieldSeen[user.FieldDisplayName] = struct{}{}
+			}
+		case "profileImage":
+			if _, ok := fieldSeen[user.FieldProfileImage]; !ok {
+				selectedFields = append(selectedFields, user.FieldProfileImage)
+				fieldSeen[user.FieldProfileImage] = struct{}{}
+			}
+		case "twitchID":
+			if _, ok := fieldSeen[user.FieldTwitchID]; !ok {
+				selectedFields = append(selectedFields, user.FieldTwitchID)
+				fieldSeen[user.FieldTwitchID] = struct{}{}
+			}
+		case "role":
+			if _, ok := fieldSeen[user.FieldRole]; !ok {
+				selectedFields = append(selectedFields, user.FieldRole)
+				fieldSeen[user.FieldRole] = struct{}{}
+			}
+		case "awards":
+			if _, ok := fieldSeen[user.FieldAwards]; !ok {
+				selectedFields = append(selectedFields, user.FieldAwards)
+				fieldSeen[user.FieldAwards] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[user.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, user.FieldCreatedAt)
+				fieldSeen[user.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[user.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, user.FieldUpdatedAt)
+				fieldSeen[user.FieldUpdatedAt] = struct{}{}
+			}
+		case "deletedAt":
+			if _, ok := fieldSeen[user.FieldDeletedAt]; !ok {
+				selectedFields = append(selectedFields, user.FieldDeletedAt)
+				fieldSeen[user.FieldDeletedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		u.Select(selectedFields...)
+	}
+	return nil
+}
+
+type userPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []UserPaginateOption
+}
+
+func newUserPaginateArgs(rv map[string]any) *userPaginateArgs {
+	args := &userPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*UserWhereInput); ok {
+		args.opts = append(args.opts, WithUserFilter(v.Filter))
 	}
 	return args
 }

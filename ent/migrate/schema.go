@@ -22,11 +22,107 @@ var (
 		Columns:    NotesColumns,
 		PrimaryKey: []*schema.Column{NotesColumns[0]},
 	}
+	// PostsColumns holds the columns for the "posts" table.
+	PostsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "pinned", Type: field.TypeBool, Default: false},
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "title", Type: field.TypeString},
+		{Name: "content", Type: field.TypeString, Nullable: true},
+		{Name: "link", Type: field.TypeString},
+		{Name: "moderation_comment", Type: field.TypeString, Nullable: true},
+		{Name: "is_moderated", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "categories", Type: field.TypeEnum, Enums: []string{"RANA", "SIN_SONIDO", "MEME_ARTESANAL", "NO_SE_YO", "ORO", "DIAMANTE", "MEH", "ALERTA_GLONETILLO", "GRR", "ENSORDECEDOR", "RAGUUUL"}},
+	}
+	// PostsTable holds the schema information for the "posts" table.
+	PostsTable = &schema.Table{
+		Name:       "posts",
+		Columns:    PostsColumns,
+		PrimaryKey: []*schema.Column{PostsColumns[0]},
+	}
+	// UsersColumns holds the columns for the "users" table.
+	UsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "display_name", Type: field.TypeString},
+		{Name: "profile_image", Type: field.TypeString, Nullable: true},
+		{Name: "twitch_id", Type: field.TypeString, Unique: true},
+		{Name: "role", Type: field.TypeEnum, Enums: []string{"USER", "ADMIN", "MODERATOR"}, Default: "USER"},
+		{Name: "awards", Type: field.TypeJSON, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+	}
+	// UsersTable holds the schema information for the "users" table.
+	UsersTable = &schema.Table{
+		Name:       "users",
+		Columns:    UsersColumns,
+		PrimaryKey: []*schema.Column{UsersColumns[0]},
+	}
+	// UserSavedPostsColumns holds the columns for the "user_saved_posts" table.
+	UserSavedPostsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "post_id", Type: field.TypeInt},
+	}
+	// UserSavedPostsTable holds the schema information for the "user_saved_posts" table.
+	UserSavedPostsTable = &schema.Table{
+		Name:       "user_saved_posts",
+		Columns:    UserSavedPostsColumns,
+		PrimaryKey: []*schema.Column{UserSavedPostsColumns[0], UserSavedPostsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_saved_posts_user_id",
+				Columns:    []*schema.Column{UserSavedPostsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_saved_posts_post_id",
+				Columns:    []*schema.Column{UserSavedPostsColumns[1]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// UserLikedPostsColumns holds the columns for the "user_liked_posts" table.
+	UserLikedPostsColumns = []*schema.Column{
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "post_id", Type: field.TypeInt},
+	}
+	// UserLikedPostsTable holds the schema information for the "user_liked_posts" table.
+	UserLikedPostsTable = &schema.Table{
+		Name:       "user_liked_posts",
+		Columns:    UserLikedPostsColumns,
+		PrimaryKey: []*schema.Column{UserLikedPostsColumns[0], UserLikedPostsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_liked_posts_user_id",
+				Columns:    []*schema.Column{UserLikedPostsColumns[0]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "user_liked_posts_post_id",
+				Columns:    []*schema.Column{UserLikedPostsColumns[1]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		NotesTable,
+		PostsTable,
+		UsersTable,
+		UserSavedPostsTable,
+		UserLikedPostsTable,
 	}
 )
 
 func init() {
+	UserSavedPostsTable.ForeignKeys[0].RefTable = UsersTable
+	UserSavedPostsTable.ForeignKeys[1].RefTable = PostsTable
+	UserLikedPostsTable.ForeignKeys[0].RefTable = UsersTable
+	UserLikedPostsTable.ForeignKeys[1].RefTable = PostsTable
 }

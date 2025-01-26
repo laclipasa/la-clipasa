@@ -4,6 +4,10 @@ package ent
 
 import (
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/laclipasa/la-clipasa/ent/post"
+	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // CreateNoteInput represents a mutation input for creating notes.
@@ -28,6 +32,110 @@ func (i *CreateNoteInput) Mutate(m *NoteMutation) {
 
 // SetInput applies the change-set in the CreateNoteInput on the NoteCreate builder.
 func (c *NoteCreate) SetInput(i CreateNoteInput) *NoteCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreatePostInput represents a mutation input for creating posts.
+type CreatePostInput struct {
+	Pinned            *bool
+	UserID            uuid.UUID
+	Title             string
+	Content           *string
+	Link              string
+	ModerationComment *string
+	IsModerated       *bool
+	CreatedAt         *time.Time
+	UpdatedAt         *time.Time
+	Categories        post.Categories
+	SavedByIDs        []int
+	LikedByIDs        []int
+}
+
+// Mutate applies the CreatePostInput on the PostMutation builder.
+func (i *CreatePostInput) Mutate(m *PostMutation) {
+	if v := i.Pinned; v != nil {
+		m.SetPinned(*v)
+	}
+	m.SetUserID(i.UserID)
+	m.SetTitle(i.Title)
+	if v := i.Content; v != nil {
+		m.SetContent(*v)
+	}
+	m.SetLink(i.Link)
+	if v := i.ModerationComment; v != nil {
+		m.SetModerationComment(*v)
+	}
+	if v := i.IsModerated; v != nil {
+		m.SetIsModerated(*v)
+	}
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	m.SetCategories(i.Categories)
+	if v := i.SavedByIDs; len(v) > 0 {
+		m.AddSavedByIDs(v...)
+	}
+	if v := i.LikedByIDs; len(v) > 0 {
+		m.AddLikedByIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the CreatePostInput on the PostCreate builder.
+func (c *PostCreate) SetInput(i CreatePostInput) *PostCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateUserInput represents a mutation input for creating users.
+type CreateUserInput struct {
+	DisplayName  string
+	ProfileImage *string
+	TwitchID     string
+	Role         *user.Role
+	Awards       []string
+	CreatedAt    *time.Time
+	UpdatedAt    *time.Time
+	DeletedAt    *time.Time
+	SavedPostIDs []int
+	LikedPostIDs []int
+}
+
+// Mutate applies the CreateUserInput on the UserMutation builder.
+func (i *CreateUserInput) Mutate(m *UserMutation) {
+	m.SetDisplayName(i.DisplayName)
+	if v := i.ProfileImage; v != nil {
+		m.SetProfileImage(*v)
+	}
+	m.SetTwitchID(i.TwitchID)
+	if v := i.Role; v != nil {
+		m.SetRole(*v)
+	}
+	if v := i.Awards; v != nil {
+		m.SetAwards(v)
+	}
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.DeletedAt; v != nil {
+		m.SetDeletedAt(*v)
+	}
+	if v := i.SavedPostIDs; len(v) > 0 {
+		m.AddSavedPostIDs(v...)
+	}
+	if v := i.LikedPostIDs; len(v) > 0 {
+		m.AddLikedPostIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the CreateUserInput on the UserCreate builder.
+func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
 	i.Mutate(c.Mutation())
 	return c
 }

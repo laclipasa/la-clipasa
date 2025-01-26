@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/laclipasa/la-clipasa/ent/note"
+	"github.com/laclipasa/la-clipasa/ent/post"
 	"github.com/laclipasa/la-clipasa/ent/predicate"
+	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // NoteWhereInput represents a where input for filtering Note queries.
@@ -308,5 +311,1011 @@ func (i *NoteWhereInput) P() (predicate.Note, error) {
 		return predicates[0], nil
 	default:
 		return note.And(predicates...), nil
+	}
+}
+
+// PostWhereInput represents a where input for filtering Post queries.
+type PostWhereInput struct {
+	Predicates []predicate.Post  `json:"-"`
+	Not        *PostWhereInput   `json:"not,omitempty"`
+	Or         []*PostWhereInput `json:"or,omitempty"`
+	And        []*PostWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "pinned" field predicates.
+	Pinned    *bool `json:"pinned,omitempty"`
+	PinnedNEQ *bool `json:"pinnedNEQ,omitempty"`
+
+	// "user_id" field predicates.
+	UserID      *uuid.UUID  `json:"userID,omitempty"`
+	UserIDNEQ   *uuid.UUID  `json:"userIDNEQ,omitempty"`
+	UserIDIn    []uuid.UUID `json:"userIDIn,omitempty"`
+	UserIDNotIn []uuid.UUID `json:"userIDNotIn,omitempty"`
+	UserIDGT    *uuid.UUID  `json:"userIDGT,omitempty"`
+	UserIDGTE   *uuid.UUID  `json:"userIDGTE,omitempty"`
+	UserIDLT    *uuid.UUID  `json:"userIDLT,omitempty"`
+	UserIDLTE   *uuid.UUID  `json:"userIDLTE,omitempty"`
+
+	// "title" field predicates.
+	Title             *string  `json:"title,omitempty"`
+	TitleNEQ          *string  `json:"titleNEQ,omitempty"`
+	TitleIn           []string `json:"titleIn,omitempty"`
+	TitleNotIn        []string `json:"titleNotIn,omitempty"`
+	TitleGT           *string  `json:"titleGT,omitempty"`
+	TitleGTE          *string  `json:"titleGTE,omitempty"`
+	TitleLT           *string  `json:"titleLT,omitempty"`
+	TitleLTE          *string  `json:"titleLTE,omitempty"`
+	TitleContains     *string  `json:"titleContains,omitempty"`
+	TitleHasPrefix    *string  `json:"titleHasPrefix,omitempty"`
+	TitleHasSuffix    *string  `json:"titleHasSuffix,omitempty"`
+	TitleEqualFold    *string  `json:"titleEqualFold,omitempty"`
+	TitleContainsFold *string  `json:"titleContainsFold,omitempty"`
+
+	// "content" field predicates.
+	Content             *string  `json:"content,omitempty"`
+	ContentNEQ          *string  `json:"contentNEQ,omitempty"`
+	ContentIn           []string `json:"contentIn,omitempty"`
+	ContentNotIn        []string `json:"contentNotIn,omitempty"`
+	ContentGT           *string  `json:"contentGT,omitempty"`
+	ContentGTE          *string  `json:"contentGTE,omitempty"`
+	ContentLT           *string  `json:"contentLT,omitempty"`
+	ContentLTE          *string  `json:"contentLTE,omitempty"`
+	ContentContains     *string  `json:"contentContains,omitempty"`
+	ContentHasPrefix    *string  `json:"contentHasPrefix,omitempty"`
+	ContentHasSuffix    *string  `json:"contentHasSuffix,omitempty"`
+	ContentIsNil        bool     `json:"contentIsNil,omitempty"`
+	ContentNotNil       bool     `json:"contentNotNil,omitempty"`
+	ContentEqualFold    *string  `json:"contentEqualFold,omitempty"`
+	ContentContainsFold *string  `json:"contentContainsFold,omitempty"`
+
+	// "link" field predicates.
+	Link             *string  `json:"link,omitempty"`
+	LinkNEQ          *string  `json:"linkNEQ,omitempty"`
+	LinkIn           []string `json:"linkIn,omitempty"`
+	LinkNotIn        []string `json:"linkNotIn,omitempty"`
+	LinkGT           *string  `json:"linkGT,omitempty"`
+	LinkGTE          *string  `json:"linkGTE,omitempty"`
+	LinkLT           *string  `json:"linkLT,omitempty"`
+	LinkLTE          *string  `json:"linkLTE,omitempty"`
+	LinkContains     *string  `json:"linkContains,omitempty"`
+	LinkHasPrefix    *string  `json:"linkHasPrefix,omitempty"`
+	LinkHasSuffix    *string  `json:"linkHasSuffix,omitempty"`
+	LinkEqualFold    *string  `json:"linkEqualFold,omitempty"`
+	LinkContainsFold *string  `json:"linkContainsFold,omitempty"`
+
+	// "moderation_comment" field predicates.
+	ModerationComment             *string  `json:"moderationComment,omitempty"`
+	ModerationCommentNEQ          *string  `json:"moderationCommentNEQ,omitempty"`
+	ModerationCommentIn           []string `json:"moderationCommentIn,omitempty"`
+	ModerationCommentNotIn        []string `json:"moderationCommentNotIn,omitempty"`
+	ModerationCommentGT           *string  `json:"moderationCommentGT,omitempty"`
+	ModerationCommentGTE          *string  `json:"moderationCommentGTE,omitempty"`
+	ModerationCommentLT           *string  `json:"moderationCommentLT,omitempty"`
+	ModerationCommentLTE          *string  `json:"moderationCommentLTE,omitempty"`
+	ModerationCommentContains     *string  `json:"moderationCommentContains,omitempty"`
+	ModerationCommentHasPrefix    *string  `json:"moderationCommentHasPrefix,omitempty"`
+	ModerationCommentHasSuffix    *string  `json:"moderationCommentHasSuffix,omitempty"`
+	ModerationCommentIsNil        bool     `json:"moderationCommentIsNil,omitempty"`
+	ModerationCommentNotNil       bool     `json:"moderationCommentNotNil,omitempty"`
+	ModerationCommentEqualFold    *string  `json:"moderationCommentEqualFold,omitempty"`
+	ModerationCommentContainsFold *string  `json:"moderationCommentContainsFold,omitempty"`
+
+	// "is_moderated" field predicates.
+	IsModerated    *bool `json:"isModerated,omitempty"`
+	IsModeratedNEQ *bool `json:"isModeratedNEQ,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "categories" field predicates.
+	Categories      *post.Categories  `json:"categories,omitempty"`
+	CategoriesNEQ   *post.Categories  `json:"categoriesNEQ,omitempty"`
+	CategoriesIn    []post.Categories `json:"categoriesIn,omitempty"`
+	CategoriesNotIn []post.Categories `json:"categoriesNotIn,omitempty"`
+
+	// "saved_by" edge predicates.
+	HasSavedBy     *bool             `json:"hasSavedBy,omitempty"`
+	HasSavedByWith []*UserWhereInput `json:"hasSavedByWith,omitempty"`
+
+	// "liked_by" edge predicates.
+	HasLikedBy     *bool             `json:"hasLikedBy,omitempty"`
+	HasLikedByWith []*UserWhereInput `json:"hasLikedByWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *PostWhereInput) AddPredicates(predicates ...predicate.Post) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the PostWhereInput filter on the PostQuery builder.
+func (i *PostWhereInput) Filter(q *PostQuery) (*PostQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyPostWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyPostWhereInput is returned in case the PostWhereInput is empty.
+var ErrEmptyPostWhereInput = errors.New("ent: empty predicate PostWhereInput")
+
+// P returns a predicate for filtering posts.
+// An error is returned if the input is empty or invalid.
+func (i *PostWhereInput) P() (predicate.Post, error) {
+	var predicates []predicate.Post
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, post.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Post, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, post.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Post, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, post.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, post.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, post.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, post.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, post.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, post.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, post.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, post.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, post.IDLTE(*i.IDLTE))
+	}
+	if i.Pinned != nil {
+		predicates = append(predicates, post.PinnedEQ(*i.Pinned))
+	}
+	if i.PinnedNEQ != nil {
+		predicates = append(predicates, post.PinnedNEQ(*i.PinnedNEQ))
+	}
+	if i.UserID != nil {
+		predicates = append(predicates, post.UserIDEQ(*i.UserID))
+	}
+	if i.UserIDNEQ != nil {
+		predicates = append(predicates, post.UserIDNEQ(*i.UserIDNEQ))
+	}
+	if len(i.UserIDIn) > 0 {
+		predicates = append(predicates, post.UserIDIn(i.UserIDIn...))
+	}
+	if len(i.UserIDNotIn) > 0 {
+		predicates = append(predicates, post.UserIDNotIn(i.UserIDNotIn...))
+	}
+	if i.UserIDGT != nil {
+		predicates = append(predicates, post.UserIDGT(*i.UserIDGT))
+	}
+	if i.UserIDGTE != nil {
+		predicates = append(predicates, post.UserIDGTE(*i.UserIDGTE))
+	}
+	if i.UserIDLT != nil {
+		predicates = append(predicates, post.UserIDLT(*i.UserIDLT))
+	}
+	if i.UserIDLTE != nil {
+		predicates = append(predicates, post.UserIDLTE(*i.UserIDLTE))
+	}
+	if i.Title != nil {
+		predicates = append(predicates, post.TitleEQ(*i.Title))
+	}
+	if i.TitleNEQ != nil {
+		predicates = append(predicates, post.TitleNEQ(*i.TitleNEQ))
+	}
+	if len(i.TitleIn) > 0 {
+		predicates = append(predicates, post.TitleIn(i.TitleIn...))
+	}
+	if len(i.TitleNotIn) > 0 {
+		predicates = append(predicates, post.TitleNotIn(i.TitleNotIn...))
+	}
+	if i.TitleGT != nil {
+		predicates = append(predicates, post.TitleGT(*i.TitleGT))
+	}
+	if i.TitleGTE != nil {
+		predicates = append(predicates, post.TitleGTE(*i.TitleGTE))
+	}
+	if i.TitleLT != nil {
+		predicates = append(predicates, post.TitleLT(*i.TitleLT))
+	}
+	if i.TitleLTE != nil {
+		predicates = append(predicates, post.TitleLTE(*i.TitleLTE))
+	}
+	if i.TitleContains != nil {
+		predicates = append(predicates, post.TitleContains(*i.TitleContains))
+	}
+	if i.TitleHasPrefix != nil {
+		predicates = append(predicates, post.TitleHasPrefix(*i.TitleHasPrefix))
+	}
+	if i.TitleHasSuffix != nil {
+		predicates = append(predicates, post.TitleHasSuffix(*i.TitleHasSuffix))
+	}
+	if i.TitleEqualFold != nil {
+		predicates = append(predicates, post.TitleEqualFold(*i.TitleEqualFold))
+	}
+	if i.TitleContainsFold != nil {
+		predicates = append(predicates, post.TitleContainsFold(*i.TitleContainsFold))
+	}
+	if i.Content != nil {
+		predicates = append(predicates, post.ContentEQ(*i.Content))
+	}
+	if i.ContentNEQ != nil {
+		predicates = append(predicates, post.ContentNEQ(*i.ContentNEQ))
+	}
+	if len(i.ContentIn) > 0 {
+		predicates = append(predicates, post.ContentIn(i.ContentIn...))
+	}
+	if len(i.ContentNotIn) > 0 {
+		predicates = append(predicates, post.ContentNotIn(i.ContentNotIn...))
+	}
+	if i.ContentGT != nil {
+		predicates = append(predicates, post.ContentGT(*i.ContentGT))
+	}
+	if i.ContentGTE != nil {
+		predicates = append(predicates, post.ContentGTE(*i.ContentGTE))
+	}
+	if i.ContentLT != nil {
+		predicates = append(predicates, post.ContentLT(*i.ContentLT))
+	}
+	if i.ContentLTE != nil {
+		predicates = append(predicates, post.ContentLTE(*i.ContentLTE))
+	}
+	if i.ContentContains != nil {
+		predicates = append(predicates, post.ContentContains(*i.ContentContains))
+	}
+	if i.ContentHasPrefix != nil {
+		predicates = append(predicates, post.ContentHasPrefix(*i.ContentHasPrefix))
+	}
+	if i.ContentHasSuffix != nil {
+		predicates = append(predicates, post.ContentHasSuffix(*i.ContentHasSuffix))
+	}
+	if i.ContentIsNil {
+		predicates = append(predicates, post.ContentIsNil())
+	}
+	if i.ContentNotNil {
+		predicates = append(predicates, post.ContentNotNil())
+	}
+	if i.ContentEqualFold != nil {
+		predicates = append(predicates, post.ContentEqualFold(*i.ContentEqualFold))
+	}
+	if i.ContentContainsFold != nil {
+		predicates = append(predicates, post.ContentContainsFold(*i.ContentContainsFold))
+	}
+	if i.Link != nil {
+		predicates = append(predicates, post.LinkEQ(*i.Link))
+	}
+	if i.LinkNEQ != nil {
+		predicates = append(predicates, post.LinkNEQ(*i.LinkNEQ))
+	}
+	if len(i.LinkIn) > 0 {
+		predicates = append(predicates, post.LinkIn(i.LinkIn...))
+	}
+	if len(i.LinkNotIn) > 0 {
+		predicates = append(predicates, post.LinkNotIn(i.LinkNotIn...))
+	}
+	if i.LinkGT != nil {
+		predicates = append(predicates, post.LinkGT(*i.LinkGT))
+	}
+	if i.LinkGTE != nil {
+		predicates = append(predicates, post.LinkGTE(*i.LinkGTE))
+	}
+	if i.LinkLT != nil {
+		predicates = append(predicates, post.LinkLT(*i.LinkLT))
+	}
+	if i.LinkLTE != nil {
+		predicates = append(predicates, post.LinkLTE(*i.LinkLTE))
+	}
+	if i.LinkContains != nil {
+		predicates = append(predicates, post.LinkContains(*i.LinkContains))
+	}
+	if i.LinkHasPrefix != nil {
+		predicates = append(predicates, post.LinkHasPrefix(*i.LinkHasPrefix))
+	}
+	if i.LinkHasSuffix != nil {
+		predicates = append(predicates, post.LinkHasSuffix(*i.LinkHasSuffix))
+	}
+	if i.LinkEqualFold != nil {
+		predicates = append(predicates, post.LinkEqualFold(*i.LinkEqualFold))
+	}
+	if i.LinkContainsFold != nil {
+		predicates = append(predicates, post.LinkContainsFold(*i.LinkContainsFold))
+	}
+	if i.ModerationComment != nil {
+		predicates = append(predicates, post.ModerationCommentEQ(*i.ModerationComment))
+	}
+	if i.ModerationCommentNEQ != nil {
+		predicates = append(predicates, post.ModerationCommentNEQ(*i.ModerationCommentNEQ))
+	}
+	if len(i.ModerationCommentIn) > 0 {
+		predicates = append(predicates, post.ModerationCommentIn(i.ModerationCommentIn...))
+	}
+	if len(i.ModerationCommentNotIn) > 0 {
+		predicates = append(predicates, post.ModerationCommentNotIn(i.ModerationCommentNotIn...))
+	}
+	if i.ModerationCommentGT != nil {
+		predicates = append(predicates, post.ModerationCommentGT(*i.ModerationCommentGT))
+	}
+	if i.ModerationCommentGTE != nil {
+		predicates = append(predicates, post.ModerationCommentGTE(*i.ModerationCommentGTE))
+	}
+	if i.ModerationCommentLT != nil {
+		predicates = append(predicates, post.ModerationCommentLT(*i.ModerationCommentLT))
+	}
+	if i.ModerationCommentLTE != nil {
+		predicates = append(predicates, post.ModerationCommentLTE(*i.ModerationCommentLTE))
+	}
+	if i.ModerationCommentContains != nil {
+		predicates = append(predicates, post.ModerationCommentContains(*i.ModerationCommentContains))
+	}
+	if i.ModerationCommentHasPrefix != nil {
+		predicates = append(predicates, post.ModerationCommentHasPrefix(*i.ModerationCommentHasPrefix))
+	}
+	if i.ModerationCommentHasSuffix != nil {
+		predicates = append(predicates, post.ModerationCommentHasSuffix(*i.ModerationCommentHasSuffix))
+	}
+	if i.ModerationCommentIsNil {
+		predicates = append(predicates, post.ModerationCommentIsNil())
+	}
+	if i.ModerationCommentNotNil {
+		predicates = append(predicates, post.ModerationCommentNotNil())
+	}
+	if i.ModerationCommentEqualFold != nil {
+		predicates = append(predicates, post.ModerationCommentEqualFold(*i.ModerationCommentEqualFold))
+	}
+	if i.ModerationCommentContainsFold != nil {
+		predicates = append(predicates, post.ModerationCommentContainsFold(*i.ModerationCommentContainsFold))
+	}
+	if i.IsModerated != nil {
+		predicates = append(predicates, post.IsModeratedEQ(*i.IsModerated))
+	}
+	if i.IsModeratedNEQ != nil {
+		predicates = append(predicates, post.IsModeratedNEQ(*i.IsModeratedNEQ))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, post.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, post.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, post.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, post.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, post.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, post.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, post.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, post.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, post.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, post.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, post.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, post.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, post.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, post.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, post.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, post.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.Categories != nil {
+		predicates = append(predicates, post.CategoriesEQ(*i.Categories))
+	}
+	if i.CategoriesNEQ != nil {
+		predicates = append(predicates, post.CategoriesNEQ(*i.CategoriesNEQ))
+	}
+	if len(i.CategoriesIn) > 0 {
+		predicates = append(predicates, post.CategoriesIn(i.CategoriesIn...))
+	}
+	if len(i.CategoriesNotIn) > 0 {
+		predicates = append(predicates, post.CategoriesNotIn(i.CategoriesNotIn...))
+	}
+
+	if i.HasSavedBy != nil {
+		p := post.HasSavedBy()
+		if !*i.HasSavedBy {
+			p = post.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSavedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasSavedByWith))
+		for _, w := range i.HasSavedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSavedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, post.HasSavedByWith(with...))
+	}
+	if i.HasLikedBy != nil {
+		p := post.HasLikedBy()
+		if !*i.HasLikedBy {
+			p = post.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLikedByWith) > 0 {
+		with := make([]predicate.User, 0, len(i.HasLikedByWith))
+		for _, w := range i.HasLikedByWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLikedByWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, post.HasLikedByWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyPostWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return post.And(predicates...), nil
+	}
+}
+
+// UserWhereInput represents a where input for filtering User queries.
+type UserWhereInput struct {
+	Predicates []predicate.User  `json:"-"`
+	Not        *UserWhereInput   `json:"not,omitempty"`
+	Or         []*UserWhereInput `json:"or,omitempty"`
+	And        []*UserWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "display_name" field predicates.
+	DisplayName             *string  `json:"displayName,omitempty"`
+	DisplayNameNEQ          *string  `json:"displayNameNEQ,omitempty"`
+	DisplayNameIn           []string `json:"displayNameIn,omitempty"`
+	DisplayNameNotIn        []string `json:"displayNameNotIn,omitempty"`
+	DisplayNameGT           *string  `json:"displayNameGT,omitempty"`
+	DisplayNameGTE          *string  `json:"displayNameGTE,omitempty"`
+	DisplayNameLT           *string  `json:"displayNameLT,omitempty"`
+	DisplayNameLTE          *string  `json:"displayNameLTE,omitempty"`
+	DisplayNameContains     *string  `json:"displayNameContains,omitempty"`
+	DisplayNameHasPrefix    *string  `json:"displayNameHasPrefix,omitempty"`
+	DisplayNameHasSuffix    *string  `json:"displayNameHasSuffix,omitempty"`
+	DisplayNameEqualFold    *string  `json:"displayNameEqualFold,omitempty"`
+	DisplayNameContainsFold *string  `json:"displayNameContainsFold,omitempty"`
+
+	// "profile_image" field predicates.
+	ProfileImage             *string  `json:"profileImage,omitempty"`
+	ProfileImageNEQ          *string  `json:"profileImageNEQ,omitempty"`
+	ProfileImageIn           []string `json:"profileImageIn,omitempty"`
+	ProfileImageNotIn        []string `json:"profileImageNotIn,omitempty"`
+	ProfileImageGT           *string  `json:"profileImageGT,omitempty"`
+	ProfileImageGTE          *string  `json:"profileImageGTE,omitempty"`
+	ProfileImageLT           *string  `json:"profileImageLT,omitempty"`
+	ProfileImageLTE          *string  `json:"profileImageLTE,omitempty"`
+	ProfileImageContains     *string  `json:"profileImageContains,omitempty"`
+	ProfileImageHasPrefix    *string  `json:"profileImageHasPrefix,omitempty"`
+	ProfileImageHasSuffix    *string  `json:"profileImageHasSuffix,omitempty"`
+	ProfileImageIsNil        bool     `json:"profileImageIsNil,omitempty"`
+	ProfileImageNotNil       bool     `json:"profileImageNotNil,omitempty"`
+	ProfileImageEqualFold    *string  `json:"profileImageEqualFold,omitempty"`
+	ProfileImageContainsFold *string  `json:"profileImageContainsFold,omitempty"`
+
+	// "twitch_id" field predicates.
+	TwitchID             *string  `json:"twitchID,omitempty"`
+	TwitchIDNEQ          *string  `json:"twitchIDNEQ,omitempty"`
+	TwitchIDIn           []string `json:"twitchIDIn,omitempty"`
+	TwitchIDNotIn        []string `json:"twitchIDNotIn,omitempty"`
+	TwitchIDGT           *string  `json:"twitchIDGT,omitempty"`
+	TwitchIDGTE          *string  `json:"twitchIDGTE,omitempty"`
+	TwitchIDLT           *string  `json:"twitchIDLT,omitempty"`
+	TwitchIDLTE          *string  `json:"twitchIDLTE,omitempty"`
+	TwitchIDContains     *string  `json:"twitchIDContains,omitempty"`
+	TwitchIDHasPrefix    *string  `json:"twitchIDHasPrefix,omitempty"`
+	TwitchIDHasSuffix    *string  `json:"twitchIDHasSuffix,omitempty"`
+	TwitchIDEqualFold    *string  `json:"twitchIDEqualFold,omitempty"`
+	TwitchIDContainsFold *string  `json:"twitchIDContainsFold,omitempty"`
+
+	// "role" field predicates.
+	Role      *user.Role  `json:"role,omitempty"`
+	RoleNEQ   *user.Role  `json:"roleNEQ,omitempty"`
+	RoleIn    []user.Role `json:"roleIn,omitempty"`
+	RoleNotIn []user.Role `json:"roleNotIn,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
+
+	// "deleted_at" field predicates.
+	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
+	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ,omitempty"`
+	DeletedAtIn     []time.Time `json:"deletedAtIn,omitempty"`
+	DeletedAtNotIn  []time.Time `json:"deletedAtNotIn,omitempty"`
+	DeletedAtGT     *time.Time  `json:"deletedAtGT,omitempty"`
+	DeletedAtGTE    *time.Time  `json:"deletedAtGTE,omitempty"`
+	DeletedAtLT     *time.Time  `json:"deletedAtLT,omitempty"`
+	DeletedAtLTE    *time.Time  `json:"deletedAtLTE,omitempty"`
+	DeletedAtIsNil  bool        `json:"deletedAtIsNil,omitempty"`
+	DeletedAtNotNil bool        `json:"deletedAtNotNil,omitempty"`
+
+	// "saved_posts" edge predicates.
+	HasSavedPosts     *bool             `json:"hasSavedPosts,omitempty"`
+	HasSavedPostsWith []*PostWhereInput `json:"hasSavedPostsWith,omitempty"`
+
+	// "liked_posts" edge predicates.
+	HasLikedPosts     *bool             `json:"hasLikedPosts,omitempty"`
+	HasLikedPostsWith []*PostWhereInput `json:"hasLikedPostsWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *UserWhereInput) AddPredicates(predicates ...predicate.User) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the UserWhereInput filter on the UserQuery builder.
+func (i *UserWhereInput) Filter(q *UserQuery) (*UserQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyUserWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyUserWhereInput is returned in case the UserWhereInput is empty.
+var ErrEmptyUserWhereInput = errors.New("ent: empty predicate UserWhereInput")
+
+// P returns a predicate for filtering users.
+// An error is returned if the input is empty or invalid.
+func (i *UserWhereInput) P() (predicate.User, error) {
+	var predicates []predicate.User
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, user.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.User, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, user.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.User, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, user.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, user.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, user.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, user.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, user.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, user.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, user.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, user.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, user.IDLTE(*i.IDLTE))
+	}
+	if i.DisplayName != nil {
+		predicates = append(predicates, user.DisplayNameEQ(*i.DisplayName))
+	}
+	if i.DisplayNameNEQ != nil {
+		predicates = append(predicates, user.DisplayNameNEQ(*i.DisplayNameNEQ))
+	}
+	if len(i.DisplayNameIn) > 0 {
+		predicates = append(predicates, user.DisplayNameIn(i.DisplayNameIn...))
+	}
+	if len(i.DisplayNameNotIn) > 0 {
+		predicates = append(predicates, user.DisplayNameNotIn(i.DisplayNameNotIn...))
+	}
+	if i.DisplayNameGT != nil {
+		predicates = append(predicates, user.DisplayNameGT(*i.DisplayNameGT))
+	}
+	if i.DisplayNameGTE != nil {
+		predicates = append(predicates, user.DisplayNameGTE(*i.DisplayNameGTE))
+	}
+	if i.DisplayNameLT != nil {
+		predicates = append(predicates, user.DisplayNameLT(*i.DisplayNameLT))
+	}
+	if i.DisplayNameLTE != nil {
+		predicates = append(predicates, user.DisplayNameLTE(*i.DisplayNameLTE))
+	}
+	if i.DisplayNameContains != nil {
+		predicates = append(predicates, user.DisplayNameContains(*i.DisplayNameContains))
+	}
+	if i.DisplayNameHasPrefix != nil {
+		predicates = append(predicates, user.DisplayNameHasPrefix(*i.DisplayNameHasPrefix))
+	}
+	if i.DisplayNameHasSuffix != nil {
+		predicates = append(predicates, user.DisplayNameHasSuffix(*i.DisplayNameHasSuffix))
+	}
+	if i.DisplayNameEqualFold != nil {
+		predicates = append(predicates, user.DisplayNameEqualFold(*i.DisplayNameEqualFold))
+	}
+	if i.DisplayNameContainsFold != nil {
+		predicates = append(predicates, user.DisplayNameContainsFold(*i.DisplayNameContainsFold))
+	}
+	if i.ProfileImage != nil {
+		predicates = append(predicates, user.ProfileImageEQ(*i.ProfileImage))
+	}
+	if i.ProfileImageNEQ != nil {
+		predicates = append(predicates, user.ProfileImageNEQ(*i.ProfileImageNEQ))
+	}
+	if len(i.ProfileImageIn) > 0 {
+		predicates = append(predicates, user.ProfileImageIn(i.ProfileImageIn...))
+	}
+	if len(i.ProfileImageNotIn) > 0 {
+		predicates = append(predicates, user.ProfileImageNotIn(i.ProfileImageNotIn...))
+	}
+	if i.ProfileImageGT != nil {
+		predicates = append(predicates, user.ProfileImageGT(*i.ProfileImageGT))
+	}
+	if i.ProfileImageGTE != nil {
+		predicates = append(predicates, user.ProfileImageGTE(*i.ProfileImageGTE))
+	}
+	if i.ProfileImageLT != nil {
+		predicates = append(predicates, user.ProfileImageLT(*i.ProfileImageLT))
+	}
+	if i.ProfileImageLTE != nil {
+		predicates = append(predicates, user.ProfileImageLTE(*i.ProfileImageLTE))
+	}
+	if i.ProfileImageContains != nil {
+		predicates = append(predicates, user.ProfileImageContains(*i.ProfileImageContains))
+	}
+	if i.ProfileImageHasPrefix != nil {
+		predicates = append(predicates, user.ProfileImageHasPrefix(*i.ProfileImageHasPrefix))
+	}
+	if i.ProfileImageHasSuffix != nil {
+		predicates = append(predicates, user.ProfileImageHasSuffix(*i.ProfileImageHasSuffix))
+	}
+	if i.ProfileImageIsNil {
+		predicates = append(predicates, user.ProfileImageIsNil())
+	}
+	if i.ProfileImageNotNil {
+		predicates = append(predicates, user.ProfileImageNotNil())
+	}
+	if i.ProfileImageEqualFold != nil {
+		predicates = append(predicates, user.ProfileImageEqualFold(*i.ProfileImageEqualFold))
+	}
+	if i.ProfileImageContainsFold != nil {
+		predicates = append(predicates, user.ProfileImageContainsFold(*i.ProfileImageContainsFold))
+	}
+	if i.TwitchID != nil {
+		predicates = append(predicates, user.TwitchIDEQ(*i.TwitchID))
+	}
+	if i.TwitchIDNEQ != nil {
+		predicates = append(predicates, user.TwitchIDNEQ(*i.TwitchIDNEQ))
+	}
+	if len(i.TwitchIDIn) > 0 {
+		predicates = append(predicates, user.TwitchIDIn(i.TwitchIDIn...))
+	}
+	if len(i.TwitchIDNotIn) > 0 {
+		predicates = append(predicates, user.TwitchIDNotIn(i.TwitchIDNotIn...))
+	}
+	if i.TwitchIDGT != nil {
+		predicates = append(predicates, user.TwitchIDGT(*i.TwitchIDGT))
+	}
+	if i.TwitchIDGTE != nil {
+		predicates = append(predicates, user.TwitchIDGTE(*i.TwitchIDGTE))
+	}
+	if i.TwitchIDLT != nil {
+		predicates = append(predicates, user.TwitchIDLT(*i.TwitchIDLT))
+	}
+	if i.TwitchIDLTE != nil {
+		predicates = append(predicates, user.TwitchIDLTE(*i.TwitchIDLTE))
+	}
+	if i.TwitchIDContains != nil {
+		predicates = append(predicates, user.TwitchIDContains(*i.TwitchIDContains))
+	}
+	if i.TwitchIDHasPrefix != nil {
+		predicates = append(predicates, user.TwitchIDHasPrefix(*i.TwitchIDHasPrefix))
+	}
+	if i.TwitchIDHasSuffix != nil {
+		predicates = append(predicates, user.TwitchIDHasSuffix(*i.TwitchIDHasSuffix))
+	}
+	if i.TwitchIDEqualFold != nil {
+		predicates = append(predicates, user.TwitchIDEqualFold(*i.TwitchIDEqualFold))
+	}
+	if i.TwitchIDContainsFold != nil {
+		predicates = append(predicates, user.TwitchIDContainsFold(*i.TwitchIDContainsFold))
+	}
+	if i.Role != nil {
+		predicates = append(predicates, user.RoleEQ(*i.Role))
+	}
+	if i.RoleNEQ != nil {
+		predicates = append(predicates, user.RoleNEQ(*i.RoleNEQ))
+	}
+	if len(i.RoleIn) > 0 {
+		predicates = append(predicates, user.RoleIn(i.RoleIn...))
+	}
+	if len(i.RoleNotIn) > 0 {
+		predicates = append(predicates, user.RoleNotIn(i.RoleNotIn...))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, user.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, user.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, user.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, user.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, user.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, user.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, user.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, user.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, user.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, user.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, user.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, user.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, user.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, user.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, user.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, user.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.DeletedAt != nil {
+		predicates = append(predicates, user.DeletedAtEQ(*i.DeletedAt))
+	}
+	if i.DeletedAtNEQ != nil {
+		predicates = append(predicates, user.DeletedAtNEQ(*i.DeletedAtNEQ))
+	}
+	if len(i.DeletedAtIn) > 0 {
+		predicates = append(predicates, user.DeletedAtIn(i.DeletedAtIn...))
+	}
+	if len(i.DeletedAtNotIn) > 0 {
+		predicates = append(predicates, user.DeletedAtNotIn(i.DeletedAtNotIn...))
+	}
+	if i.DeletedAtGT != nil {
+		predicates = append(predicates, user.DeletedAtGT(*i.DeletedAtGT))
+	}
+	if i.DeletedAtGTE != nil {
+		predicates = append(predicates, user.DeletedAtGTE(*i.DeletedAtGTE))
+	}
+	if i.DeletedAtLT != nil {
+		predicates = append(predicates, user.DeletedAtLT(*i.DeletedAtLT))
+	}
+	if i.DeletedAtLTE != nil {
+		predicates = append(predicates, user.DeletedAtLTE(*i.DeletedAtLTE))
+	}
+	if i.DeletedAtIsNil {
+		predicates = append(predicates, user.DeletedAtIsNil())
+	}
+	if i.DeletedAtNotNil {
+		predicates = append(predicates, user.DeletedAtNotNil())
+	}
+
+	if i.HasSavedPosts != nil {
+		p := user.HasSavedPosts()
+		if !*i.HasSavedPosts {
+			p = user.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSavedPostsWith) > 0 {
+		with := make([]predicate.Post, 0, len(i.HasSavedPostsWith))
+		for _, w := range i.HasSavedPostsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSavedPostsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, user.HasSavedPostsWith(with...))
+	}
+	if i.HasLikedPosts != nil {
+		p := user.HasLikedPosts()
+		if !*i.HasLikedPosts {
+			p = user.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLikedPostsWith) > 0 {
+		with := make([]predicate.Post, 0, len(i.HasLikedPostsWith))
+		for _, w := range i.HasLikedPostsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLikedPostsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, user.HasLikedPostsWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyUserWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return user.And(predicates...), nil
 	}
 }
