@@ -26,7 +26,11 @@ func (User) Fields() []ent.Field {
 			Unique(),
 		field.Enum("role").
 			Values("USER", "ADMIN", "MODERATOR").
-			Default("USER"),
+			Default("USER").
+			// we can skip fields on create default user. on update, via dedicated admin endpoints.
+			// alt: have privacy settings so we cannot mutate fields we are not allowed to
+			// alt: create Input types manually and have mutator per role
+			Annotations(entgql.Skip(entgql.SkipMutationUpdateInput, entgql.SkipMutationCreateInput)),
 		field.JSON("awards", []string{}).
 			Optional(),
 		field.Time("created_at").
@@ -53,6 +57,6 @@ func (User) Edges() []ent.Edge {
 func (User) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
-		entgql.Mutations(entgql.MutationCreate()),
+		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 	}
 }

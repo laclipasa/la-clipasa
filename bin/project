@@ -887,6 +887,7 @@ pre_build_cmd=""
 # Run backend.
 x.run.backend() {
   $pre_build_cmd
+  x.migrate up
   go run ./cmd/rest-server/main.go -env=.env.$X_ENV
 }
 

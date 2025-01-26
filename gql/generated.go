@@ -634,6 +634,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNoteOrder,
 		ec.unmarshalInputNoteWhereInput,
 		ec.unmarshalInputPostWhereInput,
+		ec.unmarshalInputUpdateUserInput,
 		ec.unmarshalInputUserWhereInput,
 	)
 	first := true
@@ -6597,7 +6598,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"displayName", "profileImage", "twitchID", "role", "awards", "createdAt", "updatedAt", "deletedAt", "savedPostIDs", "likedPostIDs", "postIDs", "commentIDs"}
+	fieldsInOrder := [...]string{"displayName", "profileImage", "twitchID", "awards", "createdAt", "updatedAt", "deletedAt", "savedPostIDs", "likedPostIDs", "postIDs", "commentIDs"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6625,13 +6626,6 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.TwitchID = data
-		case "role":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-			data, err := ec.unmarshalOUserRole2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Role = data
 		case "awards":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("awards"))
 			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
@@ -7864,6 +7858,180 @@ func (ec *executionContext) unmarshalInputPostWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.HasLikedByWith = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, obj any) (ent.UpdateUserInput, error) {
+	var it ent.UpdateUserInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"displayName", "profileImage", "clearProfileImage", "twitchID", "awards", "appendAwards", "clearAwards", "updatedAt", "deletedAt", "clearDeletedAt", "addSavedPostIDs", "removeSavedPostIDs", "clearSavedPosts", "addLikedPostIDs", "removeLikedPostIDs", "clearLikedPosts", "addPostIDs", "removePostIDs", "clearPosts", "addCommentIDs", "removeCommentIDs", "clearComments"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "displayName":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("displayName"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DisplayName = data
+		case "profileImage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profileImage"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProfileImage = data
+		case "clearProfileImage":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearProfileImage"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearProfileImage = data
+		case "twitchID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("twitchID"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TwitchID = data
+		case "awards":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("awards"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Awards = data
+		case "appendAwards":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appendAwards"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AppendAwards = data
+		case "clearAwards":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearAwards"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearAwards = data
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UpdatedAt = data
+		case "deletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAt = data
+		case "clearDeletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearDeletedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearDeletedAt = data
+		case "addSavedPostIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addSavedPostIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AddSavedPostIDs = data
+		case "removeSavedPostIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeSavedPostIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RemoveSavedPostIDs = data
+		case "clearSavedPosts":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearSavedPosts"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearSavedPosts = data
+		case "addLikedPostIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addLikedPostIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AddLikedPostIDs = data
+		case "removeLikedPostIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeLikedPostIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RemoveLikedPostIDs = data
+		case "clearLikedPosts":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLikedPosts"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearLikedPosts = data
+		case "addPostIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addPostIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AddPostIDs = data
+		case "removePostIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removePostIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RemovePostIDs = data
+		case "clearPosts":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearPosts"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearPosts = data
+		case "addCommentIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addCommentIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AddCommentIDs = data
+		case "removeCommentIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeCommentIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RemoveCommentIDs = data
+		case "clearComments":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearComments"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearComments = data
 		}
 	}
 

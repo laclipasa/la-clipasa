@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/laclipasa/la-clipasa/ent/post"
-	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // CreateCommentInput represents a mutation input for creating comments.
@@ -136,7 +135,6 @@ type CreateUserInput struct {
 	DisplayName  string
 	ProfileImage *string
 	TwitchID     string
-	Role         *user.Role
 	Awards       []string
 	CreatedAt    *time.Time
 	UpdatedAt    *time.Time
@@ -154,9 +152,6 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 		m.SetProfileImage(*v)
 	}
 	m.SetTwitchID(i.TwitchID)
-	if v := i.Role; v != nil {
-		m.SetRole(*v)
-	}
 	if v := i.Awards; v != nil {
 		m.SetAwards(v)
 	}
@@ -185,6 +180,114 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 
 // SetInput applies the change-set in the CreateUserInput on the UserCreate builder.
 func (c *UserCreate) SetInput(i CreateUserInput) *UserCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateUserInput represents a mutation input for updating users.
+type UpdateUserInput struct {
+	DisplayName        *string
+	ClearProfileImage  bool
+	ProfileImage       *string
+	TwitchID           *string
+	ClearAwards        bool
+	Awards             []string
+	AppendAwards       []string
+	UpdatedAt          *time.Time
+	ClearDeletedAt     bool
+	DeletedAt          *time.Time
+	ClearSavedPosts    bool
+	AddSavedPostIDs    []int
+	RemoveSavedPostIDs []int
+	ClearLikedPosts    bool
+	AddLikedPostIDs    []int
+	RemoveLikedPostIDs []int
+	ClearPosts         bool
+	AddPostIDs         []int
+	RemovePostIDs      []int
+	ClearComments      bool
+	AddCommentIDs      []int
+	RemoveCommentIDs   []int
+}
+
+// Mutate applies the UpdateUserInput on the UserMutation builder.
+func (i *UpdateUserInput) Mutate(m *UserMutation) {
+	if v := i.DisplayName; v != nil {
+		m.SetDisplayName(*v)
+	}
+	if i.ClearProfileImage {
+		m.ClearProfileImage()
+	}
+	if v := i.ProfileImage; v != nil {
+		m.SetProfileImage(*v)
+	}
+	if v := i.TwitchID; v != nil {
+		m.SetTwitchID(*v)
+	}
+	if i.ClearAwards {
+		m.ClearAwards()
+	}
+	if v := i.Awards; v != nil {
+		m.SetAwards(v)
+	}
+	if i.AppendAwards != nil {
+		m.AppendAwards(i.Awards)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if i.ClearDeletedAt {
+		m.ClearDeletedAt()
+	}
+	if v := i.DeletedAt; v != nil {
+		m.SetDeletedAt(*v)
+	}
+	if i.ClearSavedPosts {
+		m.ClearSavedPosts()
+	}
+	if v := i.AddSavedPostIDs; len(v) > 0 {
+		m.AddSavedPostIDs(v...)
+	}
+	if v := i.RemoveSavedPostIDs; len(v) > 0 {
+		m.RemoveSavedPostIDs(v...)
+	}
+	if i.ClearLikedPosts {
+		m.ClearLikedPosts()
+	}
+	if v := i.AddLikedPostIDs; len(v) > 0 {
+		m.AddLikedPostIDs(v...)
+	}
+	if v := i.RemoveLikedPostIDs; len(v) > 0 {
+		m.RemoveLikedPostIDs(v...)
+	}
+	if i.ClearPosts {
+		m.ClearPosts()
+	}
+	if v := i.AddPostIDs; len(v) > 0 {
+		m.AddPostIDs(v...)
+	}
+	if v := i.RemovePostIDs; len(v) > 0 {
+		m.RemovePostIDs(v...)
+	}
+	if i.ClearComments {
+		m.ClearComments()
+	}
+	if v := i.AddCommentIDs; len(v) > 0 {
+		m.AddCommentIDs(v...)
+	}
+	if v := i.RemoveCommentIDs; len(v) > 0 {
+		m.RemoveCommentIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the UpdateUserInput on the UserUpdate builder.
+func (c *UserUpdate) SetInput(i UpdateUserInput) *UserUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateUserInput on the UserUpdateOne builder.
+func (c *UserUpdateOne) SetInput(i UpdateUserInput) *UserUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }
