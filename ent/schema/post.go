@@ -3,7 +3,6 @@ package schema
 import (
 	"time"
 
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema"
@@ -65,8 +64,5 @@ func (Post) Edges() []ent.Edge {
 }
 
 func (Post) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
-		entgql.Mutations(entgql.MutationCreate()),
-	}
+	return append(baseGqlAnnotations)
 }

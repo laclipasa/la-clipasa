@@ -55,8 +55,5 @@ func (User) Edges() []ent.Edge {
 }
 
 func (User) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
-		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
-	}
+	return append(baseGqlAnnotations)
 }

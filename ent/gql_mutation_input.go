@@ -44,6 +44,58 @@ func (c *CommentCreate) SetInput(i CreateCommentInput) *CommentCreate {
 	return c
 }
 
+// UpdateCommentInput represents a mutation input for updating comments.
+type UpdateCommentInput struct {
+	Content        *string
+	UpdatedAt      *time.Time
+	ClearDeletedAt bool
+	DeletedAt      *bool
+	ClearAuthor    bool
+	AuthorID       *int
+	ClearPost      bool
+	PostID         *int
+}
+
+// Mutate applies the UpdateCommentInput on the CommentMutation builder.
+func (i *UpdateCommentInput) Mutate(m *CommentMutation) {
+	if v := i.Content; v != nil {
+		m.SetContent(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if i.ClearDeletedAt {
+		m.ClearDeletedAt()
+	}
+	if v := i.DeletedAt; v != nil {
+		m.SetDeletedAt(*v)
+	}
+	if i.ClearAuthor {
+		m.ClearAuthor()
+	}
+	if v := i.AuthorID; v != nil {
+		m.SetAuthorID(*v)
+	}
+	if i.ClearPost {
+		m.ClearPost()
+	}
+	if v := i.PostID; v != nil {
+		m.SetPostID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateCommentInput on the CommentUpdate builder.
+func (c *CommentUpdate) SetInput(i UpdateCommentInput) *CommentUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateCommentInput on the CommentUpdateOne builder.
+func (c *CommentUpdateOne) SetInput(i UpdateCommentInput) *CommentUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
 // CreateNoteInput represents a mutation input for creating notes.
 type CreateNoteInput struct {
 	Title     string
@@ -66,6 +118,42 @@ func (i *CreateNoteInput) Mutate(m *NoteMutation) {
 
 // SetInput applies the change-set in the CreateNoteInput on the NoteCreate builder.
 func (c *NoteCreate) SetInput(i CreateNoteInput) *NoteCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateNoteInput represents a mutation input for updating notes.
+type UpdateNoteInput struct {
+	Title     *string
+	Body      *string
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+}
+
+// Mutate applies the UpdateNoteInput on the NoteMutation builder.
+func (i *UpdateNoteInput) Mutate(m *NoteMutation) {
+	if v := i.Title; v != nil {
+		m.SetTitle(*v)
+	}
+	if v := i.Body; v != nil {
+		m.SetBody(*v)
+	}
+	if v := i.CreatedAt; v != nil {
+		m.SetCreatedAt(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateNoteInput on the NoteUpdate builder.
+func (c *NoteUpdate) SetInput(i UpdateNoteInput) *NoteUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateNoteInput on the NoteUpdateOne builder.
+func (c *NoteUpdateOne) SetInput(i UpdateNoteInput) *NoteUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }
@@ -126,6 +214,110 @@ func (i *CreatePostInput) Mutate(m *PostMutation) {
 
 // SetInput applies the change-set in the CreatePostInput on the PostCreate builder.
 func (c *PostCreate) SetInput(i CreatePostInput) *PostCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdatePostInput represents a mutation input for updating posts.
+type UpdatePostInput struct {
+	Pinned                 *bool
+	Title                  *string
+	ClearContent           bool
+	Content                *string
+	Link                   *string
+	ClearModerationComment bool
+	ModerationComment      *string
+	IsModerated            *bool
+	UpdatedAt              *time.Time
+	Categories             *post.Categories
+	ClearAuthor            bool
+	AuthorID               *int
+	ClearComments          bool
+	AddCommentIDs          []int
+	RemoveCommentIDs       []int
+	ClearSavedBy           bool
+	AddSavedByIDs          []int
+	RemoveSavedByIDs       []int
+	ClearLikedBy           bool
+	AddLikedByIDs          []int
+	RemoveLikedByIDs       []int
+}
+
+// Mutate applies the UpdatePostInput on the PostMutation builder.
+func (i *UpdatePostInput) Mutate(m *PostMutation) {
+	if v := i.Pinned; v != nil {
+		m.SetPinned(*v)
+	}
+	if v := i.Title; v != nil {
+		m.SetTitle(*v)
+	}
+	if i.ClearContent {
+		m.ClearContent()
+	}
+	if v := i.Content; v != nil {
+		m.SetContent(*v)
+	}
+	if v := i.Link; v != nil {
+		m.SetLink(*v)
+	}
+	if i.ClearModerationComment {
+		m.ClearModerationComment()
+	}
+	if v := i.ModerationComment; v != nil {
+		m.SetModerationComment(*v)
+	}
+	if v := i.IsModerated; v != nil {
+		m.SetIsModerated(*v)
+	}
+	if v := i.UpdatedAt; v != nil {
+		m.SetUpdatedAt(*v)
+	}
+	if v := i.Categories; v != nil {
+		m.SetCategories(*v)
+	}
+	if i.ClearAuthor {
+		m.ClearAuthor()
+	}
+	if v := i.AuthorID; v != nil {
+		m.SetAuthorID(*v)
+	}
+	if i.ClearComments {
+		m.ClearComments()
+	}
+	if v := i.AddCommentIDs; len(v) > 0 {
+		m.AddCommentIDs(v...)
+	}
+	if v := i.RemoveCommentIDs; len(v) > 0 {
+		m.RemoveCommentIDs(v...)
+	}
+	if i.ClearSavedBy {
+		m.ClearSavedBy()
+	}
+	if v := i.AddSavedByIDs; len(v) > 0 {
+		m.AddSavedByIDs(v...)
+	}
+	if v := i.RemoveSavedByIDs; len(v) > 0 {
+		m.RemoveSavedByIDs(v...)
+	}
+	if i.ClearLikedBy {
+		m.ClearLikedBy()
+	}
+	if v := i.AddLikedByIDs; len(v) > 0 {
+		m.AddLikedByIDs(v...)
+	}
+	if v := i.RemoveLikedByIDs; len(v) > 0 {
+		m.RemoveLikedByIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the UpdatePostInput on the PostUpdate builder.
+func (c *PostUpdate) SetInput(i UpdatePostInput) *PostUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdatePostInput on the PostUpdateOne builder.
+func (c *PostUpdateOne) SetInput(i UpdatePostInput) *PostUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

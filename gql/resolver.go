@@ -11,8 +11,6 @@ import (
 	"github.com/laclipasa/la-clipasa/ent"
 )
 
-//go:generate go run github.com/99designs/gqlgen@latest generate
-
 type Resolver struct {
 	ent *ent.Client
 }

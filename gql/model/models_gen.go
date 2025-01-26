@@ -3,6 +3,7 @@
 package model
 
 type NoteInput struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
+	Title      string `json:"title"`
+	Body       string `json:"body"`
+	ExtraField string `json:"extraField"`
 }

@@ -24,6 +24,7 @@ autobind:
   - github.com/laclipasa/la-clipasa/ent
 
 models:
+  # some fields are injected, like Time: https://github.com/99designs/gqlgen/blob/master/codegen/config/config.go#L846
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID
@@ -35,9 +36,6 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  Time:
-    model:
-      - github.com/99designs/gqlgen/graphql.Time
   Node:
     model:
       - github.com/laclipasa/la-clipasa/ent.Noder

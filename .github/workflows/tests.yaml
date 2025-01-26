@@ -30,7 +30,7 @@ jobs:
           # go mod download # it will access network/cache, which is not necessary with -mod=vendor
           go mod verify
 
-          project test.backend.setup
+          project c
 
           project lint
 

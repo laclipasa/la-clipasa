@@ -1,20 +1,8 @@
 
-
-
-type NoteConnection {
-  edges: [NoteEdge]
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type NoteEdge {
-  node: Note
-  cursor: Cursor!
-}
-
 input NoteInput {
   title: String!
   body: String!
+  extraField: String!
 }
 
 extend type Query {
@@ -26,4 +14,9 @@ extend type Mutation {
   createNote(input: NoteInput!): Note!
   updateNote(id: Int!, input: NoteInput!): Note!
   deleteNote(id: Int!): Boolean!
+}
+
+  # we can extend all types or hide with .Skip() annotation
+extend type Note {
+  postReadHours: Int!
 }

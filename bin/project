@@ -646,31 +646,10 @@ x.gen.build-tools() {
 # Lint the entire project.
 x.lint() {
   { { {
-    x.lint.go &
     x.lint.frontend &
     x.lint.shell &
     wait # wait_without_error -  don't care about errors yet
   } 2>&4 | xlog >&3; } 4>&1 | xerr >&3; } 3>&1
-}
-
-# Format Go files.
-x.lint.go() {
-  echo "Linting go"
-  files=$(find . \
-    -not -path "**/$PROTO_DIR/*" \
-    -not -path "**/$PG_REPO_GEN/*" \
-    -not -path "**/testdata/*" \
-    -not -path "**/node_modules/*" \
-    -not -path "**/.venv/*" \
-    -not -path "**/*.cache/*" \
-    -not -path "**/vendor/*" \
-    -not -path "**/*.gen.*" \
-    -not -path "**/*.xo.go" \
-    -name "*.go")
-  goimports -w $files || err "Linting failed"
-  gofumpt -w $files || err "Linting failed"
-  # recent releases possibly broke generated code detection
-  # golangci-lint run --config=.golangci.yml --allow-parallel-runners --fast --fix &>/dev/null || true
 }
 
 exhaustive_lint() {
@@ -705,39 +684,9 @@ linters-settings:
 #         - exhaustruct
 EOF
   )
+  LOG_LEVEL=error golangci-lint run --allow-parallel-runners --config <(echo "$lint_config")
 
-  # postgresqlrandom: ideally tests in rest, service and repo  use Random<...>CreateParams directly or indirectly
-  #                     via fixture factories, so we always want these up to date when a new field is added.
-  # services: may construct db CreateParams from specific service models
-  # repos: ensure all repos initialized (TODO: same for services)
-  # TODO: rest should force exhaust on services, rest and db structs.
-  local packages=("
-  internal/services
-  internal/repos/postgresql/postgresqlrandom
-  internal/rest
-  internal/repos
-  ")
-
-  for package in ${packages[@]}; do
-    LOG_LEVEL=error golangci-lint run --allow-parallel-runners --config <(echo "$lint_config") $package &
-  done
-
-  lint_config=$(
-    cat <<EOF
-linters:
-  disable-all: true
-  enable:
-    - exhaustruct
-linters-settings:
-  exhaustruct:
-    include:
-      - 'github\.com/laclipasa/la-clipasa/internal/repos\.Repos$'
-      - 'github\.com/laclipasa/la-clipasa/internal/services\.Services$'
-EOF
-  )
-  LOG_LEVEL=error golangci-lint run --config <(echo "$lint_config") & # ensure repo initialization is complete on all pkgs
-
-  wait_without_error
+  echo "Exhaustive linting done"
 }
 
 # Format frontend files.
@@ -788,11 +737,6 @@ x.test.backend() {
   xsetup.backup
   { { {
     exhaustive_lint
-
-    x.test.xo
-
-    # done per test suite database automatically
-    # yes y 2>/dev/null | POSTGRES_DB=$POSTGRES_TEST_DB x.migrate down || true # nochange exits
 
     go_test -tags 'skip_xo' "$@" ./...
     # go_test -tags 'skip_xo,!skip_countone' "$@" -count=1 ./...

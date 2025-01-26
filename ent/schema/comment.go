@@ -3,7 +3,6 @@ package schema
 import (
 	"time"
 
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
@@ -47,8 +46,5 @@ func (Comment) Edges() []ent.Edge {
 }
 
 func (Comment) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
-		entgql.Mutations(entgql.MutationCreate()),
-	}
+	return append(baseGqlAnnotations)
 }
