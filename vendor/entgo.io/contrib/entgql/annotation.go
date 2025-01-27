@@ -22,15 +22,6 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
-type SkipDirective int
-
-const (
-	// SkipDirectiveField indicates that the type field should not include the directive.
-	SkipDirectiveField SkipDirective = 1 << iota
-	// SkipDirectiveFieldInput indicates that the input field should not include the directive.
-	SkipDirectiveFieldInput
-)
-
 type (
 	// Annotation annotates fields and edges with metadata for templates.
 	Annotation struct {
@@ -66,7 +57,6 @@ type (
 	Directive struct {
 		Name      string          `json:"name,omitempty"`
 		Arguments []*ast.Argument `json:"arguments,omitempty"`
-		Skip      []SkipDirective `json:"modes,omitempty"`
 	}
 
 	// SkipMode is a bit flag for the Skip annotation.
@@ -556,9 +546,6 @@ func NewDirective(name string, args ...*ast.Argument) Directive {
 	return Directive{
 		Name:      name,
 		Arguments: args,
-		Skip: []SkipDirective{
-			SkipDirectiveFieldInput, // current default behavior
-		},
 	}
 }
 

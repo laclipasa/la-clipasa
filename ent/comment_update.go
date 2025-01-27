@@ -51,15 +51,15 @@ func (cu *CommentUpdate) SetUpdatedAt(t time.Time) *CommentUpdate {
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (cu *CommentUpdate) SetDeletedAt(b bool) *CommentUpdate {
-	cu.mutation.SetDeletedAt(b)
+func (cu *CommentUpdate) SetDeletedAt(t time.Time) *CommentUpdate {
+	cu.mutation.SetDeletedAt(t)
 	return cu
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (cu *CommentUpdate) SetNillableDeletedAt(b *bool) *CommentUpdate {
-	if b != nil {
-		cu.SetDeletedAt(*b)
+func (cu *CommentUpdate) SetNillableDeletedAt(t *time.Time) *CommentUpdate {
+	if t != nil {
+		cu.SetDeletedAt(*t)
 	}
 	return cu
 }
@@ -190,10 +190,10 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(comment.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := cu.mutation.DeletedAt(); ok {
-		_spec.SetField(comment.FieldDeletedAt, field.TypeBool, value)
+		_spec.SetField(comment.FieldDeletedAt, field.TypeTime, value)
 	}
 	if cu.mutation.DeletedAtCleared() {
-		_spec.ClearField(comment.FieldDeletedAt, field.TypeBool)
+		_spec.ClearField(comment.FieldDeletedAt, field.TypeTime)
 	}
 	if cu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -294,15 +294,15 @@ func (cuo *CommentUpdateOne) SetUpdatedAt(t time.Time) *CommentUpdateOne {
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (cuo *CommentUpdateOne) SetDeletedAt(b bool) *CommentUpdateOne {
-	cuo.mutation.SetDeletedAt(b)
+func (cuo *CommentUpdateOne) SetDeletedAt(t time.Time) *CommentUpdateOne {
+	cuo.mutation.SetDeletedAt(t)
 	return cuo
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (cuo *CommentUpdateOne) SetNillableDeletedAt(b *bool) *CommentUpdateOne {
-	if b != nil {
-		cuo.SetDeletedAt(*b)
+func (cuo *CommentUpdateOne) SetNillableDeletedAt(t *time.Time) *CommentUpdateOne {
+	if t != nil {
+		cuo.SetDeletedAt(*t)
 	}
 	return cuo
 }
@@ -463,10 +463,10 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 		_spec.SetField(comment.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := cuo.mutation.DeletedAt(); ok {
-		_spec.SetField(comment.FieldDeletedAt, field.TypeBool, value)
+		_spec.SetField(comment.FieldDeletedAt, field.TypeTime, value)
 	}
 	if cuo.mutation.DeletedAtCleared() {
-		_spec.ClearField(comment.FieldDeletedAt, field.TypeBool)
+		_spec.ClearField(comment.FieldDeletedAt, field.TypeTime)
 	}
 	if cuo.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{

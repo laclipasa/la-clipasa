@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema"
@@ -30,16 +28,13 @@ func (Post) Fields() []ent.Field {
 			Optional(),
 		field.Bool("is_moderated").
 			Default(false),
-		field.Time("created_at").
-			Default(time.Now).
-			Immutable(),
-		field.Time("updated_at").
-			Default(time.Now).
-			UpdateDefault(time.Now),
 		field.Enum("categories").
 			Values("RANA", "SIN_SONIDO", "MEME_ARTESANAL", "NO_SE_YO", "ORO", "DIAMANTE", "MEH", "ALERTA_GLONETILLO", "GRR", "ENSORDECEDOR", "RAGUUUL").SchemaType(map[string]string{
 			dialect.Postgres: "post_categories",
 		}),
+		createdAtField(),
+		updatedAtField(),
+		deletedAtField(),
 
 		// TODO: text searchable field with gin trigrams
 		// field.Other

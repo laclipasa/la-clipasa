@@ -1,4 +1,4 @@
 package ent
 
-//go:generate go run entc.go
-//go:generate go run github.com/99designs/gqlgen
+//go:generate go run -mod=vendor entc.go
+//go:generate go run -mod=vendor github.com/99designs/gqlgen

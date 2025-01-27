@@ -119,6 +119,7 @@ type ComplexityRoot struct {
 		Comments          func(childComplexity int) int
 		Content           func(childComplexity int) int
 		CreatedAt         func(childComplexity int) int
+		DeletedAt         func(childComplexity int) int
 		ID                func(childComplexity int) int
 		IsModerated       func(childComplexity int) int
 		LikedBy           func(childComplexity int) int
@@ -142,14 +143,14 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Comments       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CommentWhereInput) int
+		Comments       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.CommentOrder, where *ent.CommentWhereInput) int
 		Node           func(childComplexity int, id string) int
 		Nodes          func(childComplexity int, ids []string) int
 		Notes          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NoteOrder, where *ent.NoteWhereInput) int
 		PaginatedNotes func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int) int
 		PaginatedUsers func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int) int
-		Posts          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.PostWhereInput) int
-		Users          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.UserWhereInput) int
+		Posts          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.PostOrder, where *ent.PostWhereInput) int
+		Users          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
 	}
 
 	User struct {
@@ -196,10 +197,10 @@ type NoteResolver interface {
 type QueryResolver interface {
 	Node(ctx context.Context, id string) (ent.Noder, error)
 	Nodes(ctx context.Context, ids []string) ([]ent.Noder, error)
-	Comments(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CommentWhereInput) (*ent.CommentConnection, error)
+	Comments(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.CommentOrder, where *ent.CommentWhereInput) (*ent.CommentConnection, error)
 	Notes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NoteOrder, where *ent.NoteWhereInput) (*ent.NoteConnection, error)
-	Posts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.PostWhereInput) (*ent.PostConnection, error)
-	Users(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.UserWhereInput) (*ent.UserConnection, error)
+	Posts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.PostOrder, where *ent.PostWhereInput) (*ent.PostConnection, error)
+	Users(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error)
 	PaginatedNotes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int) (*ent.NoteConnection, error)
 	PaginatedUsers(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int) (*ent.UserConnection, error)
 }
@@ -405,7 +406,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Note.Body(childComplexity), true
 
-	case "Note.createdat":
+	case "Note.createdAt":
 		if e.complexity.Note.CreatedAt == nil {
 			break
 		}
@@ -433,7 +434,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Note.Title(childComplexity), true
 
-	case "Note.updatedat":
+	case "Note.updatedAt":
 		if e.complexity.Note.UpdatedAt == nil {
 			break
 		}
@@ -537,6 +538,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Post.CreatedAt(childComplexity), true
+
+	case "Post.deletedAt":
+		if e.complexity.Post.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.Post.DeletedAt(childComplexity), true
 
 	case "Post.id":
 		if e.complexity.Post.ID == nil {
@@ -646,7 +654,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Comments(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["where"].(*ent.CommentWhereInput)), true
+		return e.complexity.Query.Comments(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.CommentOrder), args["where"].(*ent.CommentWhereInput)), true
 
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
@@ -718,7 +726,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Posts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["where"].(*ent.PostWhereInput)), true
+		return e.complexity.Query.Posts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.PostOrder), args["where"].(*ent.PostWhereInput)), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -730,7 +738,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Users(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["where"].(*ent.UserWhereInput)), true
+		return e.complexity.Query.Users(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.UserOrder), args["where"].(*ent.UserWhereInput)), true
 
 	case "User.awards":
 		if e.complexity.User.Awards == nil {
@@ -867,6 +875,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAdminUpdateUserInput,
+		ec.unmarshalInputCommentOrder,
 		ec.unmarshalInputCommentWhereInput,
 		ec.unmarshalInputCreateCommentInput,
 		ec.unmarshalInputCreateNoteInput,
@@ -875,11 +884,13 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNoteInput,
 		ec.unmarshalInputNoteOrder,
 		ec.unmarshalInputNoteWhereInput,
+		ec.unmarshalInputPostOrder,
 		ec.unmarshalInputPostWhereInput,
 		ec.unmarshalInputUpdateCommentInput,
 		ec.unmarshalInputUpdateNoteInput,
 		ec.unmarshalInputUpdatePostInput,
 		ec.unmarshalInputUpdateUserInput,
+		ec.unmarshalInputUserOrder,
 		ec.unmarshalInputUserWhereInput,
 	)
 	first := true
@@ -1344,11 +1355,16 @@ func (ec *executionContext) field_Query_comments_args(ctx context.Context, rawAr
 		return nil, err
 	}
 	args["last"] = arg3
-	arg4, err := ec.field_Query_comments_argsWhere(ctx, rawArgs)
+	arg4, err := ec.field_Query_comments_argsOrderBy(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["where"] = arg4
+	args["orderBy"] = arg4
+	arg5, err := ec.field_Query_comments_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Query_comments_argsAfter(
@@ -1420,6 +1436,24 @@ func (ec *executionContext) field_Query_comments_argsLast(
 	}
 
 	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_comments_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.CommentOrder, error) {
+	if _, ok := rawArgs["orderBy"]; !ok {
+		var zeroVal *ent.CommentOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOCommentOrder2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐCommentOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.CommentOrder
 	return zeroVal, nil
 }
 
@@ -1857,11 +1891,16 @@ func (ec *executionContext) field_Query_posts_args(ctx context.Context, rawArgs 
 		return nil, err
 	}
 	args["last"] = arg3
-	arg4, err := ec.field_Query_posts_argsWhere(ctx, rawArgs)
+	arg4, err := ec.field_Query_posts_argsOrderBy(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["where"] = arg4
+	args["orderBy"] = arg4
+	arg5, err := ec.field_Query_posts_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Query_posts_argsAfter(
@@ -1936,6 +1975,24 @@ func (ec *executionContext) field_Query_posts_argsLast(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Query_posts_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.PostOrder, error) {
+	if _, ok := rawArgs["orderBy"]; !ok {
+		var zeroVal *ent.PostOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOPostOrder2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐPostOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.PostOrder
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Query_posts_argsWhere(
 	ctx context.Context,
 	rawArgs map[string]any,
@@ -1977,11 +2034,16 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 		return nil, err
 	}
 	args["last"] = arg3
-	arg4, err := ec.field_Query_users_argsWhere(ctx, rawArgs)
+	arg4, err := ec.field_Query_users_argsOrderBy(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["where"] = arg4
+	args["orderBy"] = arg4
+	arg5, err := ec.field_Query_users_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg5
 	return args, nil
 }
 func (ec *executionContext) field_Query_users_argsAfter(
@@ -2053,6 +2115,24 @@ func (ec *executionContext) field_Query_users_argsLast(
 	}
 
 	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_users_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.UserOrder, error) {
+	if _, ok := rawArgs["orderBy"]; !ok {
+		var zeroVal *ent.UserOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOUserOrder2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐUserOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.UserOrder
 	return zeroVal, nil
 }
 
@@ -2337,9 +2417,9 @@ func (ec *executionContext) _Comment_deletedAt(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(*time.Time)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Comment_deletedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2349,7 +2429,7 @@ func (ec *executionContext) fieldContext_Comment_deletedAt(_ context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2474,12 +2554,14 @@ func (ec *executionContext) fieldContext_Comment_post(_ context.Context, field g
 				return ec.fieldContext_Post_moderationComment(ctx, field)
 			case "isModerated":
 				return ec.fieldContext_Post_isModerated(ctx, field)
+			case "categories":
+				return ec.fieldContext_Post_categories(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Post_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Post_updatedAt(ctx, field)
-			case "categories":
-				return ec.fieldContext_Post_categories(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Post_deletedAt(ctx, field)
 			case "author":
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
@@ -2827,10 +2909,10 @@ func (ec *executionContext) fieldContext_Mutation_createNote(ctx context.Context
 				return ec.fieldContext_Note_title(ctx, field)
 			case "body":
 				return ec.fieldContext_Note_body(ctx, field)
-			case "createdat":
-				return ec.fieldContext_Note_createdat(ctx, field)
-			case "updatedat":
-				return ec.fieldContext_Note_updatedat(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Note_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Note_updatedAt(ctx, field)
 			case "postReadHours":
 				return ec.fieldContext_Note_postReadHours(ctx, field)
 			}
@@ -2896,10 +2978,10 @@ func (ec *executionContext) fieldContext_Mutation_updateNote(ctx context.Context
 				return ec.fieldContext_Note_title(ctx, field)
 			case "body":
 				return ec.fieldContext_Note_body(ctx, field)
-			case "createdat":
-				return ec.fieldContext_Note_createdat(ctx, field)
-			case "updatedat":
-				return ec.fieldContext_Note_updatedat(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Note_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Note_updatedAt(ctx, field)
 			case "postReadHours":
 				return ec.fieldContext_Note_postReadHours(ctx, field)
 			}
@@ -3411,8 +3493,8 @@ func (ec *executionContext) fieldContext_Note_body(_ context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _Note_createdat(ctx context.Context, field graphql.CollectedField, obj *ent.Note) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Note_createdat(ctx, field)
+func (ec *executionContext) _Note_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.Note) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Note_createdAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3442,7 +3524,7 @@ func (ec *executionContext) _Note_createdat(ctx context.Context, field graphql.C
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Note_createdat(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Note_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Note",
 		Field:      field,
@@ -3455,8 +3537,8 @@ func (ec *executionContext) fieldContext_Note_createdat(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Note_updatedat(ctx context.Context, field graphql.CollectedField, obj *ent.Note) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Note_updatedat(ctx, field)
+func (ec *executionContext) _Note_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.Note) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Note_updatedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3486,7 +3568,7 @@ func (ec *executionContext) _Note_updatedat(ctx context.Context, field graphql.C
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Note_updatedat(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Note_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Note",
 		Field:      field,
@@ -3730,10 +3812,10 @@ func (ec *executionContext) fieldContext_NoteEdge_node(_ context.Context, field 
 				return ec.fieldContext_Note_title(ctx, field)
 			case "body":
 				return ec.fieldContext_Note_body(ctx, field)
-			case "createdat":
-				return ec.fieldContext_Note_createdat(ctx, field)
-			case "updatedat":
-				return ec.fieldContext_Note_updatedat(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Note_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Note_updatedAt(ctx, field)
 			case "postReadHours":
 				return ec.fieldContext_Note_postReadHours(ctx, field)
 			}
@@ -4259,6 +4341,50 @@ func (ec *executionContext) fieldContext_Post_isModerated(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Post_categories(ctx context.Context, field graphql.CollectedField, obj *ent.Post) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Post_categories(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Categories, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(post.Categories)
+	fc.Result = res
+	return ec.marshalNPostCategories2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Post_categories(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PostCategories does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Post_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.Post) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Post_createdAt(ctx, field)
 	if err != nil {
@@ -4347,8 +4473,8 @@ func (ec *executionContext) fieldContext_Post_updatedAt(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Post_categories(ctx context.Context, field graphql.CollectedField, obj *ent.Post) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Post_categories(ctx, field)
+func (ec *executionContext) _Post_deletedAt(ctx context.Context, field graphql.CollectedField, obj *ent.Post) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Post_deletedAt(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4361,31 +4487,28 @@ func (ec *executionContext) _Post_categories(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Categories, nil
+		return obj.DeletedAt, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(post.Categories)
+	res := resTmp.(*time.Time)
 	fc.Result = res
-	return ec.marshalNPostCategories2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, field.Selections, res)
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Post_categories(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Post_deletedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Post",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type PostCategories does not have child fields")
+			return nil, errors.New("field of type Time does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4850,12 +4973,14 @@ func (ec *executionContext) fieldContext_PostEdge_node(_ context.Context, field 
 				return ec.fieldContext_Post_moderationComment(ctx, field)
 			case "isModerated":
 				return ec.fieldContext_Post_isModerated(ctx, field)
+			case "categories":
+				return ec.fieldContext_Post_categories(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Post_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Post_updatedAt(ctx, field)
-			case "categories":
-				return ec.fieldContext_Post_categories(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Post_deletedAt(ctx, field)
 			case "author":
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
@@ -5036,7 +5161,7 @@ func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Comments(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["where"].(*ent.CommentWhereInput))
+		return ec.resolvers.Query().Comments(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.CommentOrder), fc.Args["where"].(*ent.CommentWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5162,7 +5287,7 @@ func (ec *executionContext) _Query_posts(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Posts(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["where"].(*ent.PostWhereInput))
+		return ec.resolvers.Query().Posts(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.PostOrder), fc.Args["where"].(*ent.PostWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5225,7 +5350,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["where"].(*ent.UserWhereInput))
+		return ec.resolvers.Query().Users(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.UserOrder), fc.Args["where"].(*ent.UserWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5966,12 +6091,14 @@ func (ec *executionContext) fieldContext_User_savedPosts(_ context.Context, fiel
 				return ec.fieldContext_Post_moderationComment(ctx, field)
 			case "isModerated":
 				return ec.fieldContext_Post_isModerated(ctx, field)
+			case "categories":
+				return ec.fieldContext_Post_categories(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Post_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Post_updatedAt(ctx, field)
-			case "categories":
-				return ec.fieldContext_Post_categories(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Post_deletedAt(ctx, field)
 			case "author":
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
@@ -6037,12 +6164,14 @@ func (ec *executionContext) fieldContext_User_likedPosts(_ context.Context, fiel
 				return ec.fieldContext_Post_moderationComment(ctx, field)
 			case "isModerated":
 				return ec.fieldContext_Post_isModerated(ctx, field)
+			case "categories":
+				return ec.fieldContext_Post_categories(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Post_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Post_updatedAt(ctx, field)
-			case "categories":
-				return ec.fieldContext_Post_categories(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Post_deletedAt(ctx, field)
 			case "author":
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
@@ -6108,12 +6237,14 @@ func (ec *executionContext) fieldContext_User_posts(_ context.Context, field gra
 				return ec.fieldContext_Post_moderationComment(ctx, field)
 			case "isModerated":
 				return ec.fieldContext_Post_isModerated(ctx, field)
+			case "categories":
+				return ec.fieldContext_Post_categories(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Post_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_Post_updatedAt(ctx, field)
-			case "categories":
-				return ec.fieldContext_Post_categories(ctx, field)
+			case "deletedAt":
+				return ec.fieldContext_Post_deletedAt(ctx, field)
 			case "author":
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
@@ -8251,6 +8382,44 @@ func (ec *executionContext) unmarshalInputAdminUpdateUserInput(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCommentOrder(ctx context.Context, obj any) (ent.CommentOrder, error) {
+	var it ent.CommentOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNCommentOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐCommentOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCommentWhereInput(ctx context.Context, obj any) (ent.CommentWhereInput, error) {
 	var it ent.CommentWhereInput
 	asMap := map[string]any{}
@@ -8258,7 +8427,7 @@ func (ec *executionContext) unmarshalInputCommentWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "content", "contentNEQ", "contentIn", "contentNotIn", "contentGT", "contentGTE", "contentLT", "contentLTE", "contentContains", "contentHasPrefix", "contentHasSuffix", "contentEqualFold", "contentContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "deletedAt", "deletedAtNEQ", "deletedAtIsNil", "deletedAtNotNil", "hasAuthor", "hasAuthorWith", "hasPost", "hasPostWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "content", "contentNEQ", "contentIn", "contentNotIn", "contentGT", "contentGTE", "contentLT", "contentLTE", "contentContains", "contentHasPrefix", "contentHasSuffix", "contentEqualFold", "contentContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "deletedAt", "deletedAtNEQ", "deletedAtIn", "deletedAtNotIn", "deletedAtGT", "deletedAtGTE", "deletedAtLT", "deletedAtLTE", "deletedAtIsNil", "deletedAtNotNil", "hasAuthor", "hasAuthorWith", "hasPost", "hasPostWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8547,18 +8716,60 @@ func (ec *executionContext) unmarshalInputCommentWhereInput(ctx context.Context,
 			it.UpdatedAtLTE = data
 		case "deletedAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
-			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.DeletedAt = data
 		case "deletedAtNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNEQ"))
-			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.DeletedAtNEQ = data
+		case "deletedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtIn = data
+		case "deletedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNotIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtNotIn = data
+		case "deletedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtGT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtGT = data
+		case "deletedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtGTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtGTE = data
+		case "deletedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtLT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtLT = data
+		case "deletedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtLTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtLTE = data
 		case "deletedAtIsNil":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtIsNil"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
@@ -8614,7 +8825,7 @@ func (ec *executionContext) unmarshalInputCreateCommentInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"content", "createdAt", "updatedAt", "deletedAt", "authorID", "postID"}
+	fieldsInOrder := [...]string{"content", "deletedAt", "authorID", "postID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8628,23 +8839,9 @@ func (ec *executionContext) unmarshalInputCreateCommentInput(ctx context.Context
 				return it, err
 			}
 			it.Content = data
-		case "createdAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CreatedAt = data
-		case "updatedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		case "deletedAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
-			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8676,7 +8873,7 @@ func (ec *executionContext) unmarshalInputCreateNoteInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "body", "createdat", "updatedat"}
+	fieldsInOrder := [...]string{"title", "body"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8697,20 +8894,6 @@ func (ec *executionContext) unmarshalInputCreateNoteInput(ctx context.Context, o
 				return it, err
 			}
 			it.Body = data
-		case "createdat":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdat"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CreatedAt = data
-		case "updatedat":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedat"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		}
 	}
 
@@ -8724,7 +8907,7 @@ func (ec *executionContext) unmarshalInputCreatePostInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"pinned", "title", "content", "link", "moderationComment", "isModerated", "createdAt", "updatedAt", "categories", "authorID", "commentIDs", "savedByIDs", "likedByIDs"}
+	fieldsInOrder := [...]string{"pinned", "title", "content", "link", "moderationComment", "isModerated", "categories", "deletedAt", "authorID", "commentIDs", "savedByIDs", "likedByIDs"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8773,20 +8956,6 @@ func (ec *executionContext) unmarshalInputCreatePostInput(ctx context.Context, o
 				return it, err
 			}
 			it.IsModerated = data
-		case "createdAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CreatedAt = data
-		case "updatedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		case "categories":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categories"))
 			data, err := ec.unmarshalNPostCategories2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, v)
@@ -8794,6 +8963,13 @@ func (ec *executionContext) unmarshalInputCreatePostInput(ctx context.Context, o
 				return it, err
 			}
 			it.Categories = data
+		case "deletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAt = data
 		case "authorID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorID"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
@@ -8835,7 +9011,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"displayName", "profileImage", "twitchID", "role", "awards", "createdAt", "updatedAt", "deletedAt", "savedPostIDs", "likedPostIDs", "postIDs", "commentIDs"}
+	fieldsInOrder := [...]string{"displayName", "profileImage", "twitchID", "role", "awards", "deletedAt", "savedPostIDs", "likedPostIDs", "postIDs", "commentIDs"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8901,27 +9077,35 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.Awards = data
-		case "createdAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CreatedAt = data
-		case "updatedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		case "deletedAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal *time.Time
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *time.Time
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.DeletedAt = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*time.Time); ok {
+				it.DeletedAt = data
+			} else if tmp == nil {
+				it.DeletedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *time.Time`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "savedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("savedPostIDs"))
 			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
@@ -9042,7 +9226,7 @@ func (ec *executionContext) unmarshalInputNoteWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "body", "bodyNEQ", "bodyIn", "bodyNotIn", "bodyGT", "bodyGTE", "bodyLT", "bodyLTE", "bodyContains", "bodyHasPrefix", "bodyHasSuffix", "bodyEqualFold", "bodyContainsFold", "createdat", "createdatNEQ", "createdatIn", "createdatNotIn", "createdatGT", "createdatGTE", "createdatLT", "createdatLTE", "updatedat", "updatedatNEQ", "updatedatIn", "updatedatNotIn", "updatedatGT", "updatedatGTE", "updatedatLT", "updatedatLTE"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "body", "bodyNEQ", "bodyIn", "bodyNotIn", "bodyGT", "bodyGTE", "bodyLT", "bodyLTE", "bodyContains", "bodyHasPrefix", "bodyHasSuffix", "bodyEqualFold", "bodyContainsFold", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9308,118 +9492,156 @@ func (ec *executionContext) unmarshalInputNoteWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.BodyContainsFold = data
-		case "createdat":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdat"))
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAt = data
-		case "createdatNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdatNEQ"))
+		case "createdAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAtNEQ = data
-		case "createdatIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdatIn"))
+		case "createdAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
 			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAtIn = data
-		case "createdatNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdatNotIn"))
+		case "createdAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
 			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAtNotIn = data
-		case "createdatGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdatGT"))
+		case "createdAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAtGT = data
-		case "createdatGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdatGTE"))
+		case "createdAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAtGTE = data
-		case "createdatLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdatLT"))
+		case "createdAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAtLT = data
-		case "createdatLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdatLTE"))
+		case "createdAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CreatedAtLTE = data
-		case "updatedat":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedat"))
+		case "updatedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAt = data
-		case "updatedatNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedatNEQ"))
+		case "updatedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNEQ"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAtNEQ = data
-		case "updatedatIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedatIn"))
+		case "updatedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtIn"))
 			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAtIn = data
-		case "updatedatNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedatNotIn"))
+		case "updatedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtNotIn"))
 			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAtNotIn = data
-		case "updatedatGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedatGT"))
+		case "updatedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGT"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAtGT = data
-		case "updatedatGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedatGTE"))
+		case "updatedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtGTE"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAtGTE = data
-		case "updatedatLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedatLT"))
+		case "updatedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLT"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAtLT = data
-		case "updatedatLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedatLTE"))
+		case "updatedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAtLTE"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UpdatedAtLTE = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPostOrder(ctx context.Context, obj any) (ent.PostOrder, error) {
+	var it ent.PostOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNPostOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐPostOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
 		}
 	}
 
@@ -9433,7 +9655,7 @@ func (ec *executionContext) unmarshalInputPostWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "pinned", "pinnedNEQ", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "content", "contentNEQ", "contentIn", "contentNotIn", "contentGT", "contentGTE", "contentLT", "contentLTE", "contentContains", "contentHasPrefix", "contentHasSuffix", "contentIsNil", "contentNotNil", "contentEqualFold", "contentContainsFold", "link", "linkNEQ", "linkIn", "linkNotIn", "linkGT", "linkGTE", "linkLT", "linkLTE", "linkContains", "linkHasPrefix", "linkHasSuffix", "linkEqualFold", "linkContainsFold", "moderationComment", "moderationCommentNEQ", "moderationCommentIn", "moderationCommentNotIn", "moderationCommentGT", "moderationCommentGTE", "moderationCommentLT", "moderationCommentLTE", "moderationCommentContains", "moderationCommentHasPrefix", "moderationCommentHasSuffix", "moderationCommentIsNil", "moderationCommentNotNil", "moderationCommentEqualFold", "moderationCommentContainsFold", "isModerated", "isModeratedNEQ", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "categories", "categoriesNEQ", "categoriesIn", "categoriesNotIn", "hasAuthor", "hasAuthorWith", "hasComments", "hasCommentsWith", "hasSavedBy", "hasSavedByWith", "hasLikedBy", "hasLikedByWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "pinned", "pinnedNEQ", "title", "titleNEQ", "titleIn", "titleNotIn", "titleGT", "titleGTE", "titleLT", "titleLTE", "titleContains", "titleHasPrefix", "titleHasSuffix", "titleEqualFold", "titleContainsFold", "content", "contentNEQ", "contentIn", "contentNotIn", "contentGT", "contentGTE", "contentLT", "contentLTE", "contentContains", "contentHasPrefix", "contentHasSuffix", "contentIsNil", "contentNotNil", "contentEqualFold", "contentContainsFold", "link", "linkNEQ", "linkIn", "linkNotIn", "linkGT", "linkGTE", "linkLT", "linkLTE", "linkContains", "linkHasPrefix", "linkHasSuffix", "linkEqualFold", "linkContainsFold", "moderationComment", "moderationCommentNEQ", "moderationCommentIn", "moderationCommentNotIn", "moderationCommentGT", "moderationCommentGTE", "moderationCommentLT", "moderationCommentLTE", "moderationCommentContains", "moderationCommentHasPrefix", "moderationCommentHasSuffix", "moderationCommentIsNil", "moderationCommentNotNil", "moderationCommentEqualFold", "moderationCommentContainsFold", "isModerated", "isModeratedNEQ", "categories", "categoriesNEQ", "categoriesIn", "categoriesNotIn", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "deletedAt", "deletedAtNEQ", "deletedAtIn", "deletedAtNotIn", "deletedAtGT", "deletedAtGTE", "deletedAtLT", "deletedAtLTE", "deletedAtIsNil", "deletedAtNotNil", "hasAuthor", "hasAuthorWith", "hasComments", "hasCommentsWith", "hasSavedBy", "hasSavedByWith", "hasLikedBy", "hasLikedByWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9937,6 +10159,34 @@ func (ec *executionContext) unmarshalInputPostWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.IsModeratedNEQ = data
+		case "categories":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categories"))
+			data, err := ec.unmarshalOPostCategories2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Categories = data
+		case "categoriesNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoriesNEQ"))
+			data, err := ec.unmarshalOPostCategories2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CategoriesNEQ = data
+		case "categoriesIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoriesIn"))
+			data, err := ec.unmarshalOPostCategories2ᚕgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategoriesᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CategoriesIn = data
+		case "categoriesNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoriesNotIn"))
+			data, err := ec.unmarshalOPostCategories2ᚕgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategoriesᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CategoriesNotIn = data
 		case "createdAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
 			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
@@ -10049,34 +10299,76 @@ func (ec *executionContext) unmarshalInputPostWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.UpdatedAtLTE = data
-		case "categories":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categories"))
-			data, err := ec.unmarshalOPostCategories2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, v)
+		case "deletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Categories = data
-		case "categoriesNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoriesNEQ"))
-			data, err := ec.unmarshalOPostCategories2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, v)
+			it.DeletedAt = data
+		case "deletedAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNEQ"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CategoriesNEQ = data
-		case "categoriesIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoriesIn"))
-			data, err := ec.unmarshalOPostCategories2ᚕgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategoriesᚄ(ctx, v)
+			it.DeletedAtNEQ = data
+		case "deletedAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CategoriesIn = data
-		case "categoriesNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoriesNotIn"))
-			data, err := ec.unmarshalOPostCategories2ᚕgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategoriesᚄ(ctx, v)
+			it.DeletedAtIn = data
+		case "deletedAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNotIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.CategoriesNotIn = data
+			it.DeletedAtNotIn = data
+		case "deletedAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtGT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtGT = data
+		case "deletedAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtGTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtGTE = data
+		case "deletedAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtLT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtLT = data
+		case "deletedAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtLTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtLTE = data
+		case "deletedAtIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtIsNil = data
+		case "deletedAtNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAtNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAtNotNil = data
 		case "hasAuthor":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAuthor"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -10146,7 +10438,7 @@ func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"content", "updatedAt", "deletedAt", "clearDeletedAt", "authorID", "clearAuthor", "postID", "clearPost"}
+	fieldsInOrder := [...]string{"content", "deletedAt", "clearDeletedAt", "authorID", "clearAuthor", "postID", "clearPost"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10160,16 +10452,9 @@ func (ec *executionContext) unmarshalInputUpdateCommentInput(ctx context.Context
 				return it, err
 			}
 			it.Content = data
-		case "updatedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		case "deletedAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
-			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -10222,7 +10507,7 @@ func (ec *executionContext) unmarshalInputUpdateNoteInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "body", "createdat", "updatedat"}
+	fieldsInOrder := [...]string{"title", "body"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10243,20 +10528,6 @@ func (ec *executionContext) unmarshalInputUpdateNoteInput(ctx context.Context, o
 				return it, err
 			}
 			it.Body = data
-		case "createdat":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdat"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.CreatedAt = data
-		case "updatedat":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedat"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		}
 	}
 
@@ -10270,7 +10541,7 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"pinned", "title", "content", "clearContent", "link", "moderationComment", "clearModerationComment", "isModerated", "updatedAt", "categories", "authorID", "clearAuthor", "addCommentIDs", "removeCommentIDs", "clearComments", "addSavedByIDs", "removeSavedByIDs", "clearSavedBy", "addLikedByIDs", "removeLikedByIDs", "clearLikedBy"}
+	fieldsInOrder := [...]string{"pinned", "title", "content", "clearContent", "link", "moderationComment", "clearModerationComment", "isModerated", "categories", "deletedAt", "clearDeletedAt", "authorID", "clearAuthor", "addCommentIDs", "removeCommentIDs", "clearComments", "addSavedByIDs", "removeSavedByIDs", "clearSavedBy", "addLikedByIDs", "removeLikedByIDs", "clearLikedBy"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10333,13 +10604,6 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 				return it, err
 			}
 			it.IsModerated = data
-		case "updatedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		case "categories":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categories"))
 			data, err := ec.unmarshalOPostCategories2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋpostᚐCategories(ctx, v)
@@ -10347,6 +10611,20 @@ func (ec *executionContext) unmarshalInputUpdatePostInput(ctx context.Context, o
 				return it, err
 			}
 			it.Categories = data
+		case "deletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeletedAt = data
+		case "clearDeletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearDeletedAt"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearDeletedAt = data
 		case "authorID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorID"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
@@ -10437,7 +10715,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"displayName", "profileImage", "clearProfileImage", "twitchID", "role", "awards", "appendAwards", "clearAwards", "updatedAt", "deletedAt", "clearDeletedAt", "addSavedPostIDs", "removeSavedPostIDs", "clearSavedPosts", "addLikedPostIDs", "removeLikedPostIDs", "clearLikedPosts", "addPostIDs", "removePostIDs", "clearPosts", "addCommentIDs", "removeCommentIDs", "clearComments"}
+	fieldsInOrder := [...]string{"displayName", "profileImage", "clearProfileImage", "twitchID", "role", "awards", "appendAwards", "clearAwards", "deletedAt", "clearDeletedAt", "addSavedPostIDs", "removeSavedPostIDs", "clearSavedPosts", "addLikedPostIDs", "removeLikedPostIDs", "clearLikedPosts", "addPostIDs", "removePostIDs", "clearPosts", "addCommentIDs", "removeCommentIDs", "clearComments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10524,27 +10802,62 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.ClearAwards = data
-		case "updatedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("updatedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.UpdatedAt = data
 		case "deletedAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
-			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal *time.Time
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *time.Time
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.DeletedAt = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*time.Time); ok {
+				it.DeletedAt = data
+			} else if tmp == nil {
+				it.DeletedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *time.Time`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "clearDeletedAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearDeletedAt"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.ClearDeletedAt = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(bool); ok {
+				it.ClearDeletedAt = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "addSavedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addSavedPostIDs"))
 			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
@@ -10629,6 +10942,44 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.ClearComments = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUserOrder(ctx context.Context, obj any) (ent.UserOrder, error) {
+	var it ent.UserOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNUserOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐUserOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
 		}
 	}
 
@@ -11652,13 +12003,13 @@ func (ec *executionContext) _Note(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "createdat":
-			out.Values[i] = ec._Note_createdat(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Note_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "updatedat":
-			out.Values[i] = ec._Note_updatedat(ctx, field, obj)
+		case "updatedAt":
+			out.Values[i] = ec._Note_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -11896,6 +12247,11 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "categories":
+			out.Values[i] = ec._Post_categories(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "createdAt":
 			out.Values[i] = ec._Post_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -11906,11 +12262,8 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "categories":
-			out.Values[i] = ec._Post_categories(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
+		case "deletedAt":
+			out.Values[i] = ec._Post_deletedAt(ctx, field, obj)
 		case "author":
 			field := field
 
@@ -13035,6 +13388,22 @@ func (ec *executionContext) marshalNCommentConnection2ᚖgithubᚗcomᚋlaclipas
 	return ec._CommentConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNCommentOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐCommentOrderField(ctx context.Context, v any) (*ent.CommentOrderField, error) {
+	var res = new(ent.CommentOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCommentOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐCommentOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.CommentOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) unmarshalNCommentWhereInput2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐCommentWhereInput(ctx context.Context, v any) (*ent.CommentWhereInput, error) {
 	res, err := ec.unmarshalInputCommentWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -13272,6 +13641,22 @@ func (ec *executionContext) marshalNPostConnection2ᚖgithubᚗcomᚋlaclipasa�
 	return ec._PostConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNPostOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐPostOrderField(ctx context.Context, v any) (*ent.PostOrderField, error) {
+	var res = new(ent.PostOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPostOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐPostOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.PostOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) unmarshalNPostWhereInput2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐPostWhereInput(ctx context.Context, v any) (*ent.PostWhereInput, error) {
 	res, err := ec.unmarshalInputPostWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -13343,6 +13728,22 @@ func (ec *executionContext) marshalNUserConnection2ᚖgithubᚗcomᚋlaclipasa�
 		return graphql.Null
 	}
 	return ec._UserConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUserOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐUserOrderField(ctx context.Context, v any) (*ent.UserOrderField, error) {
+	var res = new(ent.UserOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUserOrderField2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐUserOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.UserOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx context.Context, v any) (user.Role, error) {
@@ -13739,6 +14140,14 @@ func (ec *executionContext) marshalOCommentEdge2ᚖgithubᚗcomᚋlaclipasaᚋla
 		return graphql.Null
 	}
 	return ec._CommentEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOCommentOrder2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐCommentOrder(ctx context.Context, v any) (*ent.CommentOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCommentOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOCommentWhereInput2ᚕᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐCommentWhereInputᚄ(ctx context.Context, v any) ([]*ent.CommentWhereInput, error) {
@@ -14138,6 +14547,14 @@ func (ec *executionContext) marshalOPostEdge2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑ
 	return ec._PostEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalOPostOrder2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐPostOrder(ctx context.Context, v any) (*ent.PostOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPostOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOPostWhereInput2ᚕᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐPostWhereInputᚄ(ctx context.Context, v any) ([]*ent.PostWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -14384,6 +14801,14 @@ func (ec *executionContext) marshalOUserEdge2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑ
 		return graphql.Null
 	}
 	return ec._UserEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOUserOrder2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐUserOrder(ctx context.Context, v any) (*ent.UserOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUserOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOUserRole2ᚕgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRoleᚄ(ctx context.Context, v any) ([]user.Role, error) {

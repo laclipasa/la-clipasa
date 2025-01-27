@@ -126,12 +126,6 @@ func (pu *PostUpdate) SetNillableIsModerated(b *bool) *PostUpdate {
 	return pu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (pu *PostUpdate) SetUpdatedAt(t time.Time) *PostUpdate {
-	pu.mutation.SetUpdatedAt(t)
-	return pu
-}
-
 // SetCategories sets the "categories" field.
 func (pu *PostUpdate) SetCategories(po post.Categories) *PostUpdate {
 	pu.mutation.SetCategories(po)
@@ -143,6 +137,32 @@ func (pu *PostUpdate) SetNillableCategories(po *post.Categories) *PostUpdate {
 	if po != nil {
 		pu.SetCategories(*po)
 	}
+	return pu
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (pu *PostUpdate) SetUpdatedAt(t time.Time) *PostUpdate {
+	pu.mutation.SetUpdatedAt(t)
+	return pu
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (pu *PostUpdate) SetDeletedAt(t time.Time) *PostUpdate {
+	pu.mutation.SetDeletedAt(t)
+	return pu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableDeletedAt(t *time.Time) *PostUpdate {
+	if t != nil {
+		pu.SetDeletedAt(*t)
+	}
+	return pu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (pu *PostUpdate) ClearDeletedAt() *PostUpdate {
+	pu.mutation.ClearDeletedAt()
 	return pu
 }
 
@@ -371,11 +391,17 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := pu.mutation.IsModerated(); ok {
 		_spec.SetField(post.FieldIsModerated, field.TypeBool, value)
 	}
+	if value, ok := pu.mutation.Categories(); ok {
+		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
+	}
 	if value, ok := pu.mutation.UpdatedAt(); ok {
 		_spec.SetField(post.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := pu.mutation.Categories(); ok {
-		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
+	if value, ok := pu.mutation.DeletedAt(); ok {
+		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
+	}
+	if pu.mutation.DeletedAtCleared() {
+		_spec.ClearField(post.FieldDeletedAt, field.TypeTime)
 	}
 	if pu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -657,12 +683,6 @@ func (puo *PostUpdateOne) SetNillableIsModerated(b *bool) *PostUpdateOne {
 	return puo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (puo *PostUpdateOne) SetUpdatedAt(t time.Time) *PostUpdateOne {
-	puo.mutation.SetUpdatedAt(t)
-	return puo
-}
-
 // SetCategories sets the "categories" field.
 func (puo *PostUpdateOne) SetCategories(po post.Categories) *PostUpdateOne {
 	puo.mutation.SetCategories(po)
@@ -674,6 +694,32 @@ func (puo *PostUpdateOne) SetNillableCategories(po *post.Categories) *PostUpdate
 	if po != nil {
 		puo.SetCategories(*po)
 	}
+	return puo
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (puo *PostUpdateOne) SetUpdatedAt(t time.Time) *PostUpdateOne {
+	puo.mutation.SetUpdatedAt(t)
+	return puo
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (puo *PostUpdateOne) SetDeletedAt(t time.Time) *PostUpdateOne {
+	puo.mutation.SetDeletedAt(t)
+	return puo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableDeletedAt(t *time.Time) *PostUpdateOne {
+	if t != nil {
+		puo.SetDeletedAt(*t)
+	}
+	return puo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (puo *PostUpdateOne) ClearDeletedAt() *PostUpdateOne {
+	puo.mutation.ClearDeletedAt()
 	return puo
 }
 
@@ -932,11 +978,17 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	if value, ok := puo.mutation.IsModerated(); ok {
 		_spec.SetField(post.FieldIsModerated, field.TypeBool, value)
 	}
+	if value, ok := puo.mutation.Categories(); ok {
+		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
+	}
 	if value, ok := puo.mutation.UpdatedAt(); ok {
 		_spec.SetField(post.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := puo.mutation.Categories(); ok {
-		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
+	if value, ok := puo.mutation.DeletedAt(); ok {
+		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
+	}
+	if puo.mutation.DeletedAtCleared() {
+		_spec.ClearField(post.FieldDeletedAt, field.TypeTime)
 	}
 	if puo.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{

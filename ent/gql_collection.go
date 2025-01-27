@@ -111,6 +111,28 @@ func newCommentPaginateArgs(rv map[string]any) *commentPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &CommentOrder{Field: &CommentOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithCommentOrder(order))
+			}
+		case *CommentOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithCommentOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*CommentWhereInput); ok {
 		args.opts = append(args.opts, WithCommentFilter(v.Filter))
 	}
@@ -148,12 +170,12 @@ func (n *NoteQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 				selectedFields = append(selectedFields, note.FieldBody)
 				fieldSeen[note.FieldBody] = struct{}{}
 			}
-		case "createdat":
+		case "createdAt":
 			if _, ok := fieldSeen[note.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, note.FieldCreatedAt)
 				fieldSeen[note.FieldCreatedAt] = struct{}{}
 			}
-		case "updatedat":
+		case "updatedAt":
 			if _, ok := fieldSeen[note.FieldUpdatedAt]; !ok {
 				selectedFields = append(selectedFields, note.FieldUpdatedAt)
 				fieldSeen[note.FieldUpdatedAt] = struct{}{}
@@ -322,6 +344,11 @@ func (po *PostQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 				selectedFields = append(selectedFields, post.FieldIsModerated)
 				fieldSeen[post.FieldIsModerated] = struct{}{}
 			}
+		case "categories":
+			if _, ok := fieldSeen[post.FieldCategories]; !ok {
+				selectedFields = append(selectedFields, post.FieldCategories)
+				fieldSeen[post.FieldCategories] = struct{}{}
+			}
 		case "createdAt":
 			if _, ok := fieldSeen[post.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, post.FieldCreatedAt)
@@ -332,10 +359,10 @@ func (po *PostQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 				selectedFields = append(selectedFields, post.FieldUpdatedAt)
 				fieldSeen[post.FieldUpdatedAt] = struct{}{}
 			}
-		case "categories":
-			if _, ok := fieldSeen[post.FieldCategories]; !ok {
-				selectedFields = append(selectedFields, post.FieldCategories)
-				fieldSeen[post.FieldCategories] = struct{}{}
+		case "deletedAt":
+			if _, ok := fieldSeen[post.FieldDeletedAt]; !ok {
+				selectedFields = append(selectedFields, post.FieldDeletedAt)
+				fieldSeen[post.FieldDeletedAt] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -371,6 +398,28 @@ func newPostPaginateArgs(rv map[string]any) *postPaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &PostOrder{Field: &PostOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithPostOrder(order))
+			}
+		case *PostOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithPostOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*PostWhereInput); ok {
 		args.opts = append(args.opts, WithPostFilter(v.Filter))
@@ -526,6 +575,28 @@ func newUserPaginateArgs(rv map[string]any) *userPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &UserOrder{Field: &UserOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithUserOrder(order))
+			}
+		case *UserOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithUserOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*UserWhereInput); ok {
 		args.opts = append(args.opts, WithUserFilter(v.Filter))
 	}
@@ -557,7 +628,7 @@ func fieldArgs(ctx context.Context, whereInput any, path ...string) map[string]a
 func unmarshalArgs(ctx context.Context, whereInput any, args map[string]any) map[string]any {
 	for _, k := range []string{firstField, lastField} {
 		v, ok := args[k]
-		if !ok || v == nil {
+		if !ok {
 			continue
 		}
 		i, err := graphql.UnmarshalInt(v)

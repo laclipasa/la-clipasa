@@ -67,10 +67,16 @@ type CommentWhereInput struct {
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
 
 	// "deleted_at" field predicates.
-	DeletedAt       *bool `json:"deletedAt,omitempty"`
-	DeletedAtNEQ    *bool `json:"deletedAtNEQ,omitempty"`
-	DeletedAtIsNil  bool  `json:"deletedAtIsNil,omitempty"`
-	DeletedAtNotNil bool  `json:"deletedAtNotNil,omitempty"`
+	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
+	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ,omitempty"`
+	DeletedAtIn     []time.Time `json:"deletedAtIn,omitempty"`
+	DeletedAtNotIn  []time.Time `json:"deletedAtNotIn,omitempty"`
+	DeletedAtGT     *time.Time  `json:"deletedAtGT,omitempty"`
+	DeletedAtGTE    *time.Time  `json:"deletedAtGTE,omitempty"`
+	DeletedAtLT     *time.Time  `json:"deletedAtLT,omitempty"`
+	DeletedAtLTE    *time.Time  `json:"deletedAtLTE,omitempty"`
+	DeletedAtIsNil  bool        `json:"deletedAtIsNil,omitempty"`
+	DeletedAtNotNil bool        `json:"deletedAtNotNil,omitempty"`
 
 	// "author" edge predicates.
 	HasAuthor     *bool             `json:"hasAuthor,omitempty"`
@@ -269,6 +275,24 @@ func (i *CommentWhereInput) P() (predicate.Comment, error) {
 	if i.DeletedAtNEQ != nil {
 		predicates = append(predicates, comment.DeletedAtNEQ(*i.DeletedAtNEQ))
 	}
+	if len(i.DeletedAtIn) > 0 {
+		predicates = append(predicates, comment.DeletedAtIn(i.DeletedAtIn...))
+	}
+	if len(i.DeletedAtNotIn) > 0 {
+		predicates = append(predicates, comment.DeletedAtNotIn(i.DeletedAtNotIn...))
+	}
+	if i.DeletedAtGT != nil {
+		predicates = append(predicates, comment.DeletedAtGT(*i.DeletedAtGT))
+	}
+	if i.DeletedAtGTE != nil {
+		predicates = append(predicates, comment.DeletedAtGTE(*i.DeletedAtGTE))
+	}
+	if i.DeletedAtLT != nil {
+		predicates = append(predicates, comment.DeletedAtLT(*i.DeletedAtLT))
+	}
+	if i.DeletedAtLTE != nil {
+		predicates = append(predicates, comment.DeletedAtLTE(*i.DeletedAtLTE))
+	}
 	if i.DeletedAtIsNil {
 		predicates = append(predicates, comment.DeletedAtIsNil())
 	}
@@ -369,25 +393,25 @@ type NoteWhereInput struct {
 	BodyEqualFold    *string  `json:"bodyEqualFold,omitempty"`
 	BodyContainsFold *string  `json:"bodyContainsFold,omitempty"`
 
-	// "createdAt" field predicates.
-	CreatedAt      *time.Time  `json:"createdat,omitempty"`
-	CreatedAtNEQ   *time.Time  `json:"createdatNEQ,omitempty"`
-	CreatedAtIn    []time.Time `json:"createdatIn,omitempty"`
-	CreatedAtNotIn []time.Time `json:"createdatNotIn,omitempty"`
-	CreatedAtGT    *time.Time  `json:"createdatGT,omitempty"`
-	CreatedAtGTE   *time.Time  `json:"createdatGTE,omitempty"`
-	CreatedAtLT    *time.Time  `json:"createdatLT,omitempty"`
-	CreatedAtLTE   *time.Time  `json:"createdatLTE,omitempty"`
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
 
-	// "updatedAt" field predicates.
-	UpdatedAt      *time.Time  `json:"updatedat,omitempty"`
-	UpdatedAtNEQ   *time.Time  `json:"updatedatNEQ,omitempty"`
-	UpdatedAtIn    []time.Time `json:"updatedatIn,omitempty"`
-	UpdatedAtNotIn []time.Time `json:"updatedatNotIn,omitempty"`
-	UpdatedAtGT    *time.Time  `json:"updatedatGT,omitempty"`
-	UpdatedAtGTE   *time.Time  `json:"updatedatGTE,omitempty"`
-	UpdatedAtLT    *time.Time  `json:"updatedatLT,omitempty"`
-	UpdatedAtLTE   *time.Time  `json:"updatedatLTE,omitempty"`
+	// "updated_at" field predicates.
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ   *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn    []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT    *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE   *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -711,6 +735,12 @@ type PostWhereInput struct {
 	IsModerated    *bool `json:"isModerated,omitempty"`
 	IsModeratedNEQ *bool `json:"isModeratedNEQ,omitempty"`
 
+	// "categories" field predicates.
+	Categories      *post.Categories  `json:"categories,omitempty"`
+	CategoriesNEQ   *post.Categories  `json:"categoriesNEQ,omitempty"`
+	CategoriesIn    []post.Categories `json:"categoriesIn,omitempty"`
+	CategoriesNotIn []post.Categories `json:"categoriesNotIn,omitempty"`
+
 	// "created_at" field predicates.
 	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
@@ -731,11 +761,17 @@ type PostWhereInput struct {
 	UpdatedAtLT    *time.Time  `json:"updatedAtLT,omitempty"`
 	UpdatedAtLTE   *time.Time  `json:"updatedAtLTE,omitempty"`
 
-	// "categories" field predicates.
-	Categories      *post.Categories  `json:"categories,omitempty"`
-	CategoriesNEQ   *post.Categories  `json:"categoriesNEQ,omitempty"`
-	CategoriesIn    []post.Categories `json:"categoriesIn,omitempty"`
-	CategoriesNotIn []post.Categories `json:"categoriesNotIn,omitempty"`
+	// "deleted_at" field predicates.
+	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
+	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ,omitempty"`
+	DeletedAtIn     []time.Time `json:"deletedAtIn,omitempty"`
+	DeletedAtNotIn  []time.Time `json:"deletedAtNotIn,omitempty"`
+	DeletedAtGT     *time.Time  `json:"deletedAtGT,omitempty"`
+	DeletedAtGTE    *time.Time  `json:"deletedAtGTE,omitempty"`
+	DeletedAtLT     *time.Time  `json:"deletedAtLT,omitempty"`
+	DeletedAtLTE    *time.Time  `json:"deletedAtLTE,omitempty"`
+	DeletedAtIsNil  bool        `json:"deletedAtIsNil,omitempty"`
+	DeletedAtNotNil bool        `json:"deletedAtNotNil,omitempty"`
 
 	// "author" edge predicates.
 	HasAuthor     *bool             `json:"hasAuthor,omitempty"`
@@ -1029,6 +1065,18 @@ func (i *PostWhereInput) P() (predicate.Post, error) {
 	if i.IsModeratedNEQ != nil {
 		predicates = append(predicates, post.IsModeratedNEQ(*i.IsModeratedNEQ))
 	}
+	if i.Categories != nil {
+		predicates = append(predicates, post.CategoriesEQ(*i.Categories))
+	}
+	if i.CategoriesNEQ != nil {
+		predicates = append(predicates, post.CategoriesNEQ(*i.CategoriesNEQ))
+	}
+	if len(i.CategoriesIn) > 0 {
+		predicates = append(predicates, post.CategoriesIn(i.CategoriesIn...))
+	}
+	if len(i.CategoriesNotIn) > 0 {
+		predicates = append(predicates, post.CategoriesNotIn(i.CategoriesNotIn...))
+	}
 	if i.CreatedAt != nil {
 		predicates = append(predicates, post.CreatedAtEQ(*i.CreatedAt))
 	}
@@ -1077,17 +1125,35 @@ func (i *PostWhereInput) P() (predicate.Post, error) {
 	if i.UpdatedAtLTE != nil {
 		predicates = append(predicates, post.UpdatedAtLTE(*i.UpdatedAtLTE))
 	}
-	if i.Categories != nil {
-		predicates = append(predicates, post.CategoriesEQ(*i.Categories))
+	if i.DeletedAt != nil {
+		predicates = append(predicates, post.DeletedAtEQ(*i.DeletedAt))
 	}
-	if i.CategoriesNEQ != nil {
-		predicates = append(predicates, post.CategoriesNEQ(*i.CategoriesNEQ))
+	if i.DeletedAtNEQ != nil {
+		predicates = append(predicates, post.DeletedAtNEQ(*i.DeletedAtNEQ))
 	}
-	if len(i.CategoriesIn) > 0 {
-		predicates = append(predicates, post.CategoriesIn(i.CategoriesIn...))
+	if len(i.DeletedAtIn) > 0 {
+		predicates = append(predicates, post.DeletedAtIn(i.DeletedAtIn...))
 	}
-	if len(i.CategoriesNotIn) > 0 {
-		predicates = append(predicates, post.CategoriesNotIn(i.CategoriesNotIn...))
+	if len(i.DeletedAtNotIn) > 0 {
+		predicates = append(predicates, post.DeletedAtNotIn(i.DeletedAtNotIn...))
+	}
+	if i.DeletedAtGT != nil {
+		predicates = append(predicates, post.DeletedAtGT(*i.DeletedAtGT))
+	}
+	if i.DeletedAtGTE != nil {
+		predicates = append(predicates, post.DeletedAtGTE(*i.DeletedAtGTE))
+	}
+	if i.DeletedAtLT != nil {
+		predicates = append(predicates, post.DeletedAtLT(*i.DeletedAtLT))
+	}
+	if i.DeletedAtLTE != nil {
+		predicates = append(predicates, post.DeletedAtLTE(*i.DeletedAtLTE))
+	}
+	if i.DeletedAtIsNil {
+		predicates = append(predicates, post.DeletedAtIsNil())
+	}
+	if i.DeletedAtNotNil {
+		predicates = append(predicates, post.DeletedAtNotNil())
 	}
 
 	if i.HasAuthor != nil {

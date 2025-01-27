@@ -26,7 +26,7 @@ type Comment struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
-	DeletedAt *bool `json:"deleted_at,omitempty"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CommentQuery when eager-loading is set.
 	Edges         CommentEdges `json:"edges"`
@@ -75,13 +75,11 @@ func (*Comment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case comment.FieldDeletedAt:
-			values[i] = new(sql.NullBool)
 		case comment.FieldID:
 			values[i] = new(sql.NullInt64)
 		case comment.FieldContent:
 			values[i] = new(sql.NullString)
-		case comment.FieldCreatedAt, comment.FieldUpdatedAt:
+		case comment.FieldCreatedAt, comment.FieldUpdatedAt, comment.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case comment.ForeignKeys[0]: // post_comments
 			values[i] = new(sql.NullInt64)
@@ -127,11 +125,11 @@ func (c *Comment) assignValues(columns []string, values []any) error {
 				c.UpdatedAt = value.Time
 			}
 		case comment.FieldDeletedAt:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				c.DeletedAt = new(bool)
-				*c.DeletedAt = value.Bool
+				c.DeletedAt = new(time.Time)
+				*c.DeletedAt = value.Time
 			}
 		case comment.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -204,7 +202,7 @@ func (c *Comment) String() string {
 	builder.WriteString(", ")
 	if v := c.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
+		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteByte(')')
 	return builder.String()

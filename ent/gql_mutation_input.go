@@ -12,9 +12,7 @@ import (
 // CreateCommentInput represents a mutation input for creating comments.
 type CreateCommentInput struct {
 	Content   string
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
-	DeletedAt *bool
+	DeletedAt *time.Time
 	AuthorID  *int
 	PostID    *int
 }
@@ -22,12 +20,6 @@ type CreateCommentInput struct {
 // Mutate applies the CreateCommentInput on the CommentMutation builder.
 func (i *CreateCommentInput) Mutate(m *CommentMutation) {
 	m.SetContent(i.Content)
-	if v := i.CreatedAt; v != nil {
-		m.SetCreatedAt(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
 	if v := i.DeletedAt; v != nil {
 		m.SetDeletedAt(*v)
 	}
@@ -48,9 +40,8 @@ func (c *CommentCreate) SetInput(i CreateCommentInput) *CommentCreate {
 // UpdateCommentInput represents a mutation input for updating comments.
 type UpdateCommentInput struct {
 	Content        *string
-	UpdatedAt      *time.Time
 	ClearDeletedAt bool
-	DeletedAt      *bool
+	DeletedAt      *time.Time
 	ClearAuthor    bool
 	AuthorID       *int
 	ClearPost      bool
@@ -61,9 +52,6 @@ type UpdateCommentInput struct {
 func (i *UpdateCommentInput) Mutate(m *CommentMutation) {
 	if v := i.Content; v != nil {
 		m.SetContent(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
 	}
 	if i.ClearDeletedAt {
 		m.ClearDeletedAt()
@@ -99,22 +87,14 @@ func (c *CommentUpdateOne) SetInput(i UpdateCommentInput) *CommentUpdateOne {
 
 // CreateNoteInput represents a mutation input for creating notes.
 type CreateNoteInput struct {
-	Title     string
-	Body      string
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
+	Title string
+	Body  string
 }
 
 // Mutate applies the CreateNoteInput on the NoteMutation builder.
 func (i *CreateNoteInput) Mutate(m *NoteMutation) {
 	m.SetTitle(i.Title)
 	m.SetBody(i.Body)
-	if v := i.CreatedAt; v != nil {
-		m.SetCreatedAt(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
 }
 
 // SetInput applies the change-set in the CreateNoteInput on the NoteCreate builder.
@@ -125,10 +105,8 @@ func (c *NoteCreate) SetInput(i CreateNoteInput) *NoteCreate {
 
 // UpdateNoteInput represents a mutation input for updating notes.
 type UpdateNoteInput struct {
-	Title     *string
-	Body      *string
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
+	Title *string
+	Body  *string
 }
 
 // Mutate applies the UpdateNoteInput on the NoteMutation builder.
@@ -138,12 +116,6 @@ func (i *UpdateNoteInput) Mutate(m *NoteMutation) {
 	}
 	if v := i.Body; v != nil {
 		m.SetBody(*v)
-	}
-	if v := i.CreatedAt; v != nil {
-		m.SetCreatedAt(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
 	}
 }
 
@@ -167,9 +139,8 @@ type CreatePostInput struct {
 	Link              string
 	ModerationComment *string
 	IsModerated       *bool
-	CreatedAt         *time.Time
-	UpdatedAt         *time.Time
 	Categories        post.Categories
+	DeletedAt         *time.Time
 	AuthorID          *int
 	CommentIDs        []int
 	SavedByIDs        []int
@@ -192,13 +163,10 @@ func (i *CreatePostInput) Mutate(m *PostMutation) {
 	if v := i.IsModerated; v != nil {
 		m.SetIsModerated(*v)
 	}
-	if v := i.CreatedAt; v != nil {
-		m.SetCreatedAt(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
 	m.SetCategories(i.Categories)
+	if v := i.DeletedAt; v != nil {
+		m.SetDeletedAt(*v)
+	}
 	if v := i.AuthorID; v != nil {
 		m.SetAuthorID(*v)
 	}
@@ -229,8 +197,9 @@ type UpdatePostInput struct {
 	ClearModerationComment bool
 	ModerationComment      *string
 	IsModerated            *bool
-	UpdatedAt              *time.Time
 	Categories             *post.Categories
+	ClearDeletedAt         bool
+	DeletedAt              *time.Time
 	ClearAuthor            bool
 	AuthorID               *int
 	ClearComments          bool
@@ -270,11 +239,14 @@ func (i *UpdatePostInput) Mutate(m *PostMutation) {
 	if v := i.IsModerated; v != nil {
 		m.SetIsModerated(*v)
 	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
-	}
 	if v := i.Categories; v != nil {
 		m.SetCategories(*v)
+	}
+	if i.ClearDeletedAt {
+		m.ClearDeletedAt()
+	}
+	if v := i.DeletedAt; v != nil {
+		m.SetDeletedAt(*v)
 	}
 	if i.ClearAuthor {
 		m.ClearAuthor()
@@ -330,8 +302,6 @@ type CreateUserInput struct {
 	TwitchID     string
 	Role         *user.Role
 	Awards       []string
-	CreatedAt    *time.Time
-	UpdatedAt    *time.Time
 	DeletedAt    *time.Time
 	SavedPostIDs []int
 	LikedPostIDs []int
@@ -351,12 +321,6 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 	}
 	if v := i.Awards; v != nil {
 		m.SetAwards(v)
-	}
-	if v := i.CreatedAt; v != nil {
-		m.SetCreatedAt(*v)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
 	}
 	if v := i.DeletedAt; v != nil {
 		m.SetDeletedAt(*v)
@@ -391,7 +355,6 @@ type UpdateUserInput struct {
 	ClearAwards        bool
 	Awards             []string
 	AppendAwards       []string
-	UpdatedAt          *time.Time
 	ClearDeletedAt     bool
 	DeletedAt          *time.Time
 	ClearSavedPosts    bool
@@ -433,9 +396,6 @@ func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	}
 	if i.AppendAwards != nil {
 		m.AppendAwards(i.Awards)
-	}
-	if v := i.UpdatedAt; v != nil {
-		m.SetUpdatedAt(*v)
 	}
 	if i.ClearDeletedAt {
 		m.ClearDeletedAt()

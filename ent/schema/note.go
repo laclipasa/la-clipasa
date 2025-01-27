@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
@@ -24,17 +22,8 @@ func (Note) Fields() []ent.Field {
 			),
 		field.Text("body"),
 
-		field.Time("createdAt").
-			Default(time.Now).
-			Annotations(
-				entgql.OrderField("CREATED_AT"),
-			),
-		field.Time("updatedAt").
-			Default(time.Now).
-			UpdateDefault(time.Now).
-			Annotations(
-				entgql.OrderField("UPDATED_AT"),
-			),
+		createdAtField(),
+		updatedAtField(),
 	}
 }
 

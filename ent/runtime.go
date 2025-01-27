@@ -38,15 +38,15 @@ func init() {
 	noteDescTitle := noteFields[0].Descriptor()
 	// note.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	note.TitleValidator = noteDescTitle.Validators[0].(func(string) error)
-	// noteDescCreatedAt is the schema descriptor for createdAt field.
+	// noteDescCreatedAt is the schema descriptor for created_at field.
 	noteDescCreatedAt := noteFields[2].Descriptor()
-	// note.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	// note.DefaultCreatedAt holds the default value on creation for the created_at field.
 	note.DefaultCreatedAt = noteDescCreatedAt.Default.(func() time.Time)
-	// noteDescUpdatedAt is the schema descriptor for updatedAt field.
+	// noteDescUpdatedAt is the schema descriptor for updated_at field.
 	noteDescUpdatedAt := noteFields[3].Descriptor()
-	// note.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	// note.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	note.DefaultUpdatedAt = noteDescUpdatedAt.Default.(func() time.Time)
-	// note.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	// note.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	note.UpdateDefaultUpdatedAt = noteDescUpdatedAt.UpdateDefault.(func() time.Time)
 	postFields := schema.Post{}.Fields()
 	_ = postFields
@@ -63,11 +63,11 @@ func init() {
 	// post.DefaultIsModerated holds the default value on creation for the is_moderated field.
 	post.DefaultIsModerated = postDescIsModerated.Default.(bool)
 	// postDescCreatedAt is the schema descriptor for created_at field.
-	postDescCreatedAt := postFields[6].Descriptor()
+	postDescCreatedAt := postFields[7].Descriptor()
 	// post.DefaultCreatedAt holds the default value on creation for the created_at field.
 	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
 	// postDescUpdatedAt is the schema descriptor for updated_at field.
-	postDescUpdatedAt := postFields[7].Descriptor()
+	postDescUpdatedAt := postFields[8].Descriptor()
 	// post.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	post.DefaultUpdatedAt = postDescUpdatedAt.Default.(func() time.Time)
 	// post.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

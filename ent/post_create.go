@@ -90,6 +90,12 @@ func (pc *PostCreate) SetNillableIsModerated(b *bool) *PostCreate {
 	return pc
 }
 
+// SetCategories sets the "categories" field.
+func (pc *PostCreate) SetCategories(po post.Categories) *PostCreate {
+	pc.mutation.SetCategories(po)
+	return pc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (pc *PostCreate) SetCreatedAt(t time.Time) *PostCreate {
 	pc.mutation.SetCreatedAt(t)
@@ -118,9 +124,17 @@ func (pc *PostCreate) SetNillableUpdatedAt(t *time.Time) *PostCreate {
 	return pc
 }
 
-// SetCategories sets the "categories" field.
-func (pc *PostCreate) SetCategories(po post.Categories) *PostCreate {
-	pc.mutation.SetCategories(po)
+// SetDeletedAt sets the "deleted_at" field.
+func (pc *PostCreate) SetDeletedAt(t time.Time) *PostCreate {
+	pc.mutation.SetDeletedAt(t)
+	return pc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetDeletedAt(*t)
+	}
 	return pc
 }
 
@@ -260,12 +274,6 @@ func (pc *PostCreate) check() error {
 	if _, ok := pc.mutation.IsModerated(); !ok {
 		return &ValidationError{Name: "is_moderated", err: errors.New(`ent: missing required field "Post.is_moderated"`)}
 	}
-	if _, ok := pc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Post.created_at"`)}
-	}
-	if _, ok := pc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Post.updated_at"`)}
-	}
 	if _, ok := pc.mutation.Categories(); !ok {
 		return &ValidationError{Name: "categories", err: errors.New(`ent: missing required field "Post.categories"`)}
 	}
@@ -273,6 +281,12 @@ func (pc *PostCreate) check() error {
 		if err := post.CategoriesValidator(v); err != nil {
 			return &ValidationError{Name: "categories", err: fmt.Errorf(`ent: validator failed for field "Post.categories": %w`, err)}
 		}
+	}
+	if _, ok := pc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Post.created_at"`)}
+	}
+	if _, ok := pc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Post.updated_at"`)}
 	}
 	return nil
 }
@@ -324,6 +338,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldIsModerated, field.TypeBool, value)
 		_node.IsModerated = value
 	}
+	if value, ok := pc.mutation.Categories(); ok {
+		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
+		_node.Categories = value
+	}
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.SetField(post.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -332,9 +350,9 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := pc.mutation.Categories(); ok {
-		_spec.SetField(post.FieldCategories, field.TypeEnum, value)
-		_node.Categories = value
+	if value, ok := pc.mutation.DeletedAt(); ok {
+		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
 	}
 	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

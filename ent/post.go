@@ -30,12 +30,14 @@ type Post struct {
 	ModerationComment string `json:"moderation_comment,omitempty"`
 	// IsModerated holds the value of the "is_moderated" field.
 	IsModerated bool `json:"is_moderated,omitempty"`
+	// Categories holds the value of the "categories" field.
+	Categories post.Categories `json:"categories,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// Categories holds the value of the "categories" field.
-	Categories post.Categories `json:"categories,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
 	Edges        PostEdges `json:"edges"`
@@ -113,7 +115,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case post.FieldTitle, post.FieldContent, post.FieldLink, post.FieldModerationComment, post.FieldCategories:
 			values[i] = new(sql.NullString)
-		case post.FieldCreatedAt, post.FieldUpdatedAt:
+		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
 		case post.ForeignKeys[0]: // user_posts
 			values[i] = new(sql.NullInt64)
@@ -175,6 +177,12 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				po.IsModerated = value.Bool
 			}
+		case post.FieldCategories:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field categories", values[i])
+			} else if value.Valid {
+				po.Categories = post.Categories(value.String)
+			}
 		case post.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -187,11 +195,12 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				po.UpdatedAt = value.Time
 			}
-		case post.FieldCategories:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field categories", values[i])
+		case post.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				po.Categories = post.Categories(value.String)
+				po.DeletedAt = new(time.Time)
+				*po.DeletedAt = value.Time
 			}
 		case post.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -276,14 +285,19 @@ func (po *Post) String() string {
 	builder.WriteString("is_moderated=")
 	builder.WriteString(fmt.Sprintf("%v", po.IsModerated))
 	builder.WriteString(", ")
+	builder.WriteString("categories=")
+	builder.WriteString(fmt.Sprintf("%v", po.Categories))
+	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(po.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(po.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("categories=")
-	builder.WriteString(fmt.Sprintf("%v", po.Categories))
+	if v := po.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

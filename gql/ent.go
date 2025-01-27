@@ -19,7 +19,7 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, e
 }
 
 // Comments is the resolver for the comments field.
-func (r *queryResolver) Comments(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CommentWhereInput) (*ent.CommentConnection, error) {
+func (r *queryResolver) Comments(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.CommentOrder, where *ent.CommentWhereInput) (*ent.CommentConnection, error) {
 	panic(fmt.Errorf("not implemented: Comments - comments"))
 }
 
@@ -29,12 +29,12 @@ func (r *queryResolver) Notes(ctx context.Context, after *entgql.Cursor[int], fi
 }
 
 // Posts is the resolver for the posts field.
-func (r *queryResolver) Posts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.PostWhereInput) (*ent.PostConnection, error) {
+func (r *queryResolver) Posts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.PostOrder, where *ent.PostWhereInput) (*ent.PostConnection, error) {
 	panic(fmt.Errorf("not implemented: Posts - posts"))
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.UserWhereInput) (*ent.UserConnection, error) {
+func (r *queryResolver) Users(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) (*ent.UserConnection, error) {
 	return r.ent.User.Query().Paginate(ctx, after, first, before, last)
 }
 

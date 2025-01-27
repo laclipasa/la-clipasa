@@ -21,10 +21,10 @@ type Note struct {
 	Title string `json:"title,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
-	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt,omitempty"`
-	// UpdatedAt holds the value of the "updatedAt" field.
-	UpdatedAt    time.Time `json:"updatedAt,omitempty"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UpdatedAt holds the value of the "updated_at" field.
+	UpdatedAt    time.Time `json:"updated_at,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -74,13 +74,13 @@ func (n *Note) assignValues(columns []string, values []any) error {
 			}
 		case note.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				n.CreatedAt = value.Time
 			}
 		case note.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updatedAt", values[i])
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				n.UpdatedAt = value.Time
 			}
@@ -126,10 +126,10 @@ func (n *Note) String() string {
 	builder.WriteString("body=")
 	builder.WriteString(n.Body)
 	builder.WriteString(", ")
-	builder.WriteString("createdAt=")
+	builder.WriteString("created_at=")
 	builder.WriteString(n.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("updatedAt=")
+	builder.WriteString("updated_at=")
 	builder.WriteString(n.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

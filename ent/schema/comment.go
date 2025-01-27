@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
@@ -19,15 +17,10 @@ func (Comment) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("content").
 			NotEmpty(),
-		field.Time("created_at").
-			Default(time.Now).
-			Immutable(),
-		field.Time("updated_at").
-			Default(time.Now).
-			UpdateDefault(time.Now),
-		field.Bool("deleted_at").
-			Optional().
-			Nillable(),
+
+		createdAtField(),
+		updatedAtField(),
+		deletedAtField(),
 	}
 }
 

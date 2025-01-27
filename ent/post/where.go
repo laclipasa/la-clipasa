@@ -95,6 +95,11 @@ func UpdatedAt(v time.Time) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
+func DeletedAt(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldDeletedAt, v))
+}
+
 // PinnedEQ applies the EQ predicate on the "pinned" field.
 func PinnedEQ(v bool) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldPinned, v))
@@ -395,6 +400,26 @@ func IsModeratedNEQ(v bool) predicate.Post {
 	return predicate.Post(sql.FieldNEQ(FieldIsModerated, v))
 }
 
+// CategoriesEQ applies the EQ predicate on the "categories" field.
+func CategoriesEQ(v Categories) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldCategories, v))
+}
+
+// CategoriesNEQ applies the NEQ predicate on the "categories" field.
+func CategoriesNEQ(v Categories) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldCategories, v))
+}
+
+// CategoriesIn applies the In predicate on the "categories" field.
+func CategoriesIn(vs ...Categories) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldCategories, vs...))
+}
+
+// CategoriesNotIn applies the NotIn predicate on the "categories" field.
+func CategoriesNotIn(vs ...Categories) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldCategories, vs...))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldCreatedAt, v))
@@ -475,24 +500,54 @@ func UpdatedAtLTE(v time.Time) predicate.Post {
 	return predicate.Post(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// CategoriesEQ applies the EQ predicate on the "categories" field.
-func CategoriesEQ(v Categories) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldCategories, v))
+// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
+func DeletedAtEQ(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldDeletedAt, v))
 }
 
-// CategoriesNEQ applies the NEQ predicate on the "categories" field.
-func CategoriesNEQ(v Categories) predicate.Post {
-	return predicate.Post(sql.FieldNEQ(FieldCategories, v))
+// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
+func DeletedAtNEQ(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldDeletedAt, v))
 }
 
-// CategoriesIn applies the In predicate on the "categories" field.
-func CategoriesIn(vs ...Categories) predicate.Post {
-	return predicate.Post(sql.FieldIn(FieldCategories, vs...))
+// DeletedAtIn applies the In predicate on the "deleted_at" field.
+func DeletedAtIn(vs ...time.Time) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldDeletedAt, vs...))
 }
 
-// CategoriesNotIn applies the NotIn predicate on the "categories" field.
-func CategoriesNotIn(vs ...Categories) predicate.Post {
-	return predicate.Post(sql.FieldNotIn(FieldCategories, vs...))
+// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
+func DeletedAtNotIn(vs ...time.Time) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldDeletedAt, vs...))
+}
+
+// DeletedAtGT applies the GT predicate on the "deleted_at" field.
+func DeletedAtGT(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldGT(FieldDeletedAt, v))
+}
+
+// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
+func DeletedAtGTE(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldGTE(FieldDeletedAt, v))
+}
+
+// DeletedAtLT applies the LT predicate on the "deleted_at" field.
+func DeletedAtLT(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldLT(FieldDeletedAt, v))
+}
+
+// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
+func DeletedAtLTE(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldLTE(FieldDeletedAt, v))
+}
+
+// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
+func DeletedAtIsNil() predicate.Post {
+	return predicate.Post(sql.FieldIsNull(FieldDeletedAt))
+}
+
+// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
+func DeletedAtNotNil() predicate.Post {
+	return predicate.Post(sql.FieldNotNull(FieldDeletedAt))
 }
 
 // HasAuthor applies the HasEdge predicate on the "author" edge.

@@ -14,7 +14,7 @@ var (
 		{Name: "content", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeBool, Nullable: true},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "post_comments", Type: field.TypeInt, Nullable: true},
 		{Name: "user_comments", Type: field.TypeInt, Nullable: true},
 	}
@@ -61,9 +61,10 @@ var (
 		{Name: "link", Type: field.TypeString},
 		{Name: "moderation_comment", Type: field.TypeString, Nullable: true},
 		{Name: "is_moderated", Type: field.TypeBool, Default: false},
+		{Name: "categories", Type: field.TypeEnum, Enums: []string{"RANA", "SIN_SONIDO", "MEME_ARTESANAL", "NO_SE_YO", "ORO", "DIAMANTE", "MEH", "ALERTA_GLONETILLO", "GRR", "ENSORDECEDOR", "RAGUUUL"}, SchemaType: map[string]string{"postgres": "post_categories"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "categories", Type: field.TypeEnum, Enums: []string{"RANA", "SIN_SONIDO", "MEME_ARTESANAL", "NO_SE_YO", "ORO", "DIAMANTE", "MEH", "ALERTA_GLONETILLO", "GRR", "ENSORDECEDOR", "RAGUUUL"}, SchemaType: map[string]string{"postgres": "post_categories"}},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "user_posts", Type: field.TypeInt, Nullable: true},
 	}
 	// PostsTable holds the schema information for the "posts" table.
@@ -74,7 +75,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_users_posts",
-				Columns:    []*schema.Column{PostsColumns[10]},
+				Columns:    []*schema.Column{PostsColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

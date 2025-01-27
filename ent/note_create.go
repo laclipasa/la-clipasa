@@ -32,13 +32,13 @@ func (nc *NoteCreate) SetBody(s string) *NoteCreate {
 	return nc
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (nc *NoteCreate) SetCreatedAt(t time.Time) *NoteCreate {
 	nc.mutation.SetCreatedAt(t)
 	return nc
 }
 
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
 func (nc *NoteCreate) SetNillableCreatedAt(t *time.Time) *NoteCreate {
 	if t != nil {
 		nc.SetCreatedAt(*t)
@@ -46,13 +46,13 @@ func (nc *NoteCreate) SetNillableCreatedAt(t *time.Time) *NoteCreate {
 	return nc
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (nc *NoteCreate) SetUpdatedAt(t time.Time) *NoteCreate {
 	nc.mutation.SetUpdatedAt(t)
 	return nc
 }
 
-// SetNillableUpdatedAt sets the "updatedAt" field if the given value is not nil.
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
 func (nc *NoteCreate) SetNillableUpdatedAt(t *time.Time) *NoteCreate {
 	if t != nil {
 		nc.SetUpdatedAt(*t)
@@ -119,10 +119,10 @@ func (nc *NoteCreate) check() error {
 		return &ValidationError{Name: "body", err: errors.New(`ent: missing required field "Note.body"`)}
 	}
 	if _, ok := nc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Note.createdAt"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Note.created_at"`)}
 	}
 	if _, ok := nc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updatedAt", err: errors.New(`ent: missing required field "Note.updatedAt"`)}
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Note.updated_at"`)}
 	}
 	return nil
 }

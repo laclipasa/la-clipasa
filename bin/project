@@ -1021,7 +1021,7 @@ x.ent.generate-migration() {
     tmp="${tmp// /_}"
     name="${tmp,,}"
     test -z $name && err "Please provide a migration name"
-    go run -mod=mod ent/migrate/main.go "$name"
+    go run -mod=vendor ent/migrate/main.go "$name"
   } 2>&4 | xlog >&3; } 4>&1 | xerr >&3; } 3>&1
 }
 

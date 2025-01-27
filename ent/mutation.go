@@ -42,7 +42,7 @@ type CommentMutation struct {
 	content       *string
 	created_at    *time.Time
 	updated_at    *time.Time
-	deleted_at    *bool
+	deleted_at    *time.Time
 	clearedFields map[string]struct{}
 	author        *int
 	clearedauthor bool
@@ -260,12 +260,12 @@ func (m *CommentMutation) ResetUpdatedAt() {
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (m *CommentMutation) SetDeletedAt(b bool) {
-	m.deleted_at = &b
+func (m *CommentMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
 }
 
 // DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *CommentMutation) DeletedAt() (r bool, exists bool) {
+func (m *CommentMutation) DeletedAt() (r time.Time, exists bool) {
 	v := m.deleted_at
 	if v == nil {
 		return
@@ -276,7 +276,7 @@ func (m *CommentMutation) DeletedAt() (r bool, exists bool) {
 // OldDeletedAt returns the old "deleted_at" field's value of the Comment entity.
 // If the Comment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CommentMutation) OldDeletedAt(ctx context.Context) (v *bool, err error) {
+func (m *CommentMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
 	}
@@ -497,7 +497,7 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 		m.SetUpdatedAt(v)
 		return nil
 	case comment.FieldDeletedAt:
-		v, ok := value.(bool)
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -677,8 +677,8 @@ type NoteMutation struct {
 	id            *int
 	title         *string
 	body          *string
-	createdAt     *time.Time
-	updatedAt     *time.Time
+	created_at    *time.Time
+	updated_at    *time.Time
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Note, error)
@@ -855,21 +855,21 @@ func (m *NoteMutation) ResetBody() {
 	m.body = nil
 }
 
-// SetCreatedAt sets the "createdAt" field.
+// SetCreatedAt sets the "created_at" field.
 func (m *NoteMutation) SetCreatedAt(t time.Time) {
-	m.createdAt = &t
+	m.created_at = &t
 }
 
-// CreatedAt returns the value of the "createdAt" field in the mutation.
+// CreatedAt returns the value of the "created_at" field in the mutation.
 func (m *NoteMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.createdAt
+	v := m.created_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCreatedAt returns the old "createdAt" field's value of the Note entity.
+// OldCreatedAt returns the old "created_at" field's value of the Note entity.
 // If the Note object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *NoteMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
@@ -886,26 +886,26 @@ func (m *NoteMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error
 	return oldValue.CreatedAt, nil
 }
 
-// ResetCreatedAt resets all changes to the "createdAt" field.
+// ResetCreatedAt resets all changes to the "created_at" field.
 func (m *NoteMutation) ResetCreatedAt() {
-	m.createdAt = nil
+	m.created_at = nil
 }
 
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (m *NoteMutation) SetUpdatedAt(t time.Time) {
-	m.updatedAt = &t
+	m.updated_at = &t
 }
 
-// UpdatedAt returns the value of the "updatedAt" field in the mutation.
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
 func (m *NoteMutation) UpdatedAt() (r time.Time, exists bool) {
-	v := m.updatedAt
+	v := m.updated_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUpdatedAt returns the old "updatedAt" field's value of the Note entity.
+// OldUpdatedAt returns the old "updated_at" field's value of the Note entity.
 // If the Note object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *NoteMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
@@ -922,9 +922,9 @@ func (m *NoteMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error
 	return oldValue.UpdatedAt, nil
 }
 
-// ResetUpdatedAt resets all changes to the "updatedAt" field.
+// ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *NoteMutation) ResetUpdatedAt() {
-	m.updatedAt = nil
+	m.updated_at = nil
 }
 
 // Where appends a list predicates to the NoteMutation builder.
@@ -968,10 +968,10 @@ func (m *NoteMutation) Fields() []string {
 	if m.body != nil {
 		fields = append(fields, note.FieldBody)
 	}
-	if m.createdAt != nil {
+	if m.created_at != nil {
 		fields = append(fields, note.FieldCreatedAt)
 	}
-	if m.updatedAt != nil {
+	if m.updated_at != nil {
 		fields = append(fields, note.FieldUpdatedAt)
 	}
 	return fields
@@ -1169,9 +1169,10 @@ type PostMutation struct {
 	link               *string
 	moderation_comment *string
 	is_moderated       *bool
+	categories         *post.Categories
 	created_at         *time.Time
 	updated_at         *time.Time
-	categories         *post.Categories
+	deleted_at         *time.Time
 	clearedFields      map[string]struct{}
 	author             *int
 	clearedauthor      bool
@@ -1529,6 +1530,42 @@ func (m *PostMutation) ResetIsModerated() {
 	m.is_moderated = nil
 }
 
+// SetCategories sets the "categories" field.
+func (m *PostMutation) SetCategories(po post.Categories) {
+	m.categories = &po
+}
+
+// Categories returns the value of the "categories" field in the mutation.
+func (m *PostMutation) Categories() (r post.Categories, exists bool) {
+	v := m.categories
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCategories returns the old "categories" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldCategories(ctx context.Context) (v post.Categories, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCategories is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCategories requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCategories: %w", err)
+	}
+	return oldValue.Categories, nil
+}
+
+// ResetCategories resets all changes to the "categories" field.
+func (m *PostMutation) ResetCategories() {
+	m.categories = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *PostMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -1601,40 +1638,53 @@ func (m *PostMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetCategories sets the "categories" field.
-func (m *PostMutation) SetCategories(po post.Categories) {
-	m.categories = &po
+// SetDeletedAt sets the "deleted_at" field.
+func (m *PostMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
 }
 
-// Categories returns the value of the "categories" field in the mutation.
-func (m *PostMutation) Categories() (r post.Categories, exists bool) {
-	v := m.categories
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *PostMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCategories returns the old "categories" field's value of the Post entity.
+// OldDeletedAt returns the old "deleted_at" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldCategories(ctx context.Context) (v post.Categories, err error) {
+func (m *PostMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCategories is only allowed on UpdateOne operations")
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCategories requires an ID field in the mutation")
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCategories: %w", err)
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
 	}
-	return oldValue.Categories, nil
+	return oldValue.DeletedAt, nil
 }
 
-// ResetCategories resets all changes to the "categories" field.
-func (m *PostMutation) ResetCategories() {
-	m.categories = nil
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *PostMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[post.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *PostMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[post.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *PostMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, post.FieldDeletedAt)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by id.
@@ -1872,7 +1922,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.pinned != nil {
 		fields = append(fields, post.FieldPinned)
 	}
@@ -1891,14 +1941,17 @@ func (m *PostMutation) Fields() []string {
 	if m.is_moderated != nil {
 		fields = append(fields, post.FieldIsModerated)
 	}
+	if m.categories != nil {
+		fields = append(fields, post.FieldCategories)
+	}
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, post.FieldUpdatedAt)
 	}
-	if m.categories != nil {
-		fields = append(fields, post.FieldCategories)
+	if m.deleted_at != nil {
+		fields = append(fields, post.FieldDeletedAt)
 	}
 	return fields
 }
@@ -1920,12 +1973,14 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.ModerationComment()
 	case post.FieldIsModerated:
 		return m.IsModerated()
+	case post.FieldCategories:
+		return m.Categories()
 	case post.FieldCreatedAt:
 		return m.CreatedAt()
 	case post.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case post.FieldCategories:
-		return m.Categories()
+	case post.FieldDeletedAt:
+		return m.DeletedAt()
 	}
 	return nil, false
 }
@@ -1947,12 +2002,14 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldModerationComment(ctx)
 	case post.FieldIsModerated:
 		return m.OldIsModerated(ctx)
+	case post.FieldCategories:
+		return m.OldCategories(ctx)
 	case post.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case post.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case post.FieldCategories:
-		return m.OldCategories(ctx)
+	case post.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Post field %s", name)
 }
@@ -2004,6 +2061,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetIsModerated(v)
 		return nil
+	case post.FieldCategories:
+		v, ok := value.(post.Categories)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCategories(v)
+		return nil
 	case post.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -2018,12 +2082,12 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case post.FieldCategories:
-		v, ok := value.(post.Categories)
+	case post.FieldDeletedAt:
+		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCategories(v)
+		m.SetDeletedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)
@@ -2061,6 +2125,9 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldModerationComment) {
 		fields = append(fields, post.FieldModerationComment)
 	}
+	if m.FieldCleared(post.FieldDeletedAt) {
+		fields = append(fields, post.FieldDeletedAt)
+	}
 	return fields
 }
 
@@ -2080,6 +2147,9 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldModerationComment:
 		m.ClearModerationComment()
+		return nil
+	case post.FieldDeletedAt:
+		m.ClearDeletedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Post nullable field %s", name)
@@ -2107,14 +2177,17 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldIsModerated:
 		m.ResetIsModerated()
 		return nil
+	case post.FieldCategories:
+		m.ResetCategories()
+		return nil
 	case post.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
 	case post.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case post.FieldCategories:
-		m.ResetCategories()
+	case post.FieldDeletedAt:
+		m.ResetDeletedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Post field %s", name)

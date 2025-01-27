@@ -29,12 +29,14 @@ const (
 	FieldModerationComment = "moderation_comment"
 	// FieldIsModerated holds the string denoting the is_moderated field in the database.
 	FieldIsModerated = "is_moderated"
+	// FieldCategories holds the string denoting the categories field in the database.
+	FieldCategories = "categories"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// FieldCategories holds the string denoting the categories field in the database.
-	FieldCategories = "categories"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
 	// EdgeComments holds the string denoting the comments edge name in mutations.
@@ -80,9 +82,10 @@ var Columns = []string{
 	FieldLink,
 	FieldModerationComment,
 	FieldIsModerated,
+	FieldCategories,
 	FieldCreatedAt,
 	FieldUpdatedAt,
-	FieldCategories,
+	FieldDeletedAt,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
@@ -200,6 +203,11 @@ func ByIsModerated(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsModerated, opts...).ToFunc()
 }
 
+// ByCategories orders the results by the categories field.
+func ByCategories(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCategories, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -210,9 +218,9 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByCategories orders the results by the categories field.
-func ByCategories(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCategories, opts...).ToFunc()
+// ByDeletedAt orders the results by the deleted_at field.
+func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
 }
 
 // ByAuthorField orders the results by author field.

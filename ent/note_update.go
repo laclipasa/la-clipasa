@@ -56,21 +56,7 @@ func (nu *NoteUpdate) SetNillableBody(s *string) *NoteUpdate {
 	return nu
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (nu *NoteUpdate) SetCreatedAt(t time.Time) *NoteUpdate {
-	nu.mutation.SetCreatedAt(t)
-	return nu
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (nu *NoteUpdate) SetNillableCreatedAt(t *time.Time) *NoteUpdate {
-	if t != nil {
-		nu.SetCreatedAt(*t)
-	}
-	return nu
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (nu *NoteUpdate) SetUpdatedAt(t time.Time) *NoteUpdate {
 	nu.mutation.SetUpdatedAt(t)
 	return nu
@@ -145,9 +131,6 @@ func (nu *NoteUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := nu.mutation.Body(); ok {
 		_spec.SetField(note.FieldBody, field.TypeString, value)
 	}
-	if value, ok := nu.mutation.CreatedAt(); ok {
-		_spec.SetField(note.FieldCreatedAt, field.TypeTime, value)
-	}
 	if value, ok := nu.mutation.UpdatedAt(); ok {
 		_spec.SetField(note.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -199,21 +182,7 @@ func (nuo *NoteUpdateOne) SetNillableBody(s *string) *NoteUpdateOne {
 	return nuo
 }
 
-// SetCreatedAt sets the "createdAt" field.
-func (nuo *NoteUpdateOne) SetCreatedAt(t time.Time) *NoteUpdateOne {
-	nuo.mutation.SetCreatedAt(t)
-	return nuo
-}
-
-// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
-func (nuo *NoteUpdateOne) SetNillableCreatedAt(t *time.Time) *NoteUpdateOne {
-	if t != nil {
-		nuo.SetCreatedAt(*t)
-	}
-	return nuo
-}
-
-// SetUpdatedAt sets the "updatedAt" field.
+// SetUpdatedAt sets the "updated_at" field.
 func (nuo *NoteUpdateOne) SetUpdatedAt(t time.Time) *NoteUpdateOne {
 	nuo.mutation.SetUpdatedAt(t)
 	return nuo
@@ -317,9 +286,6 @@ func (nuo *NoteUpdateOne) sqlSave(ctx context.Context) (_node *Note, err error) 
 	}
 	if value, ok := nuo.mutation.Body(); ok {
 		_spec.SetField(note.FieldBody, field.TypeString, value)
-	}
-	if value, ok := nuo.mutation.CreatedAt(); ok {
-		_spec.SetField(note.FieldCreatedAt, field.TypeTime, value)
 	}
 	if value, ok := nuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(note.FieldUpdatedAt, field.TypeTime, value)

@@ -16,6 +16,13 @@ import (
 )
 
 func main() {
+	deletedAtDirectiveField := DirectiveField{
+		FieldName: "deletedAt",
+		Targets:   []DirectiveTarget{CreateInputFieldTarget, UpdateInputFieldTarget},
+		Directives: []entgql.Directive{
+			schema.HasRoleDirective(user.RoleADMIN),
+		},
+	}
 	ex, err := entgql.NewExtension(
 		// Tell Ent to generate a GraphQL schema for
 		// the Ent schema in a file named ent.graphql.
@@ -33,6 +40,7 @@ func main() {
 						schema.HasRoleDirective(user.RoleADMIN),
 					},
 				},
+				deletedAtDirectiveField,
 			},
 		})),
 	)
@@ -55,25 +63,49 @@ func main() {
 type DirectiveTarget int
 
 const (
+	// Field targets
 	TypeFieldTarget DirectiveTarget = iota
 	CreateInputFieldTarget
 	UpdateInputFieldTarget
 
+	// Object targets
 	TypeObjectTarget
 	CreateInputObjectTarget
 	UpdateInputObjectTarget
 )
 
+func HasMixedTargets(targets []DirectiveTarget) bool {
+	var combinedBits uint
+
+	for _, target := range targets {
+		combinedBits |= 1 << target
+	}
+
+	hasFieldTargets := (combinedBits & FieldTargetsMask) != 0
+	hasObjectTargets := (combinedBits & ObjectTargetsMask) != 0
+
+	return hasFieldTargets && hasObjectTargets
+}
+
+const (
+	FieldTargetsMask  = 1<<TypeFieldTarget | 1<<CreateInputFieldTarget | 1<<UpdateInputFieldTarget
+	ObjectTargetsMask = 1<<TypeObjectTarget | 1<<CreateInputObjectTarget | 1<<UpdateInputObjectTarget
+)
+
 type DirectiveField struct {
+	// database field name
 	FieldName  string
 	Targets    []DirectiveTarget
 	Directives []entgql.Directive
 }
 
 func applyDirectives(entityDirectives map[string][]DirectiveField) entgql.SchemaHook {
-	return func(_ *gen.Graph, s *ast.Schema) error {
+	return func(graph *gen.Graph, s *ast.Schema) error {
 		for typeName, directives := range entityDirectives {
-			for _, df := range directives {
+			for dfIdx, df := range directives {
+				if HasMixedTargets(df.Targets) {
+					return fmt.Errorf("directive (%d) for %q has mixed targets", dfIdx, typeName)
+				}
 				for _, target := range df.Targets {
 					var gqlType string
 					switch target {
@@ -89,27 +121,49 @@ func applyDirectives(entityDirectives map[string][]DirectiveField) entgql.Schema
 					if t == nil {
 						return fmt.Errorf("type %q not found", gqlType)
 					}
+					var genType *gen.Type
+					for _, element := range graph.Nodes {
+						if element.Name == typeName {
+							genType = element
+							break
+						}
+					}
 
 					if df.FieldName != "" {
-						// assume directive assigned to field
-						f := t.Fields.ForName(df.FieldName)
-						if f == nil {
-							return fmt.Errorf("field %q not found in type %q", df.FieldName, gqlType)
+						// assign to field
+						if err := addDirectiveToField(t, df.FieldName, df.Directives); err != nil {
+							return fmt.Errorf("couldn't add directive to %q: %w", gqlType, err)
 						}
-						for _, d := range df.Directives {
-							f.Directives = append(f.Directives, &ast.Directive{
-								Name:      d.Name,
-								Arguments: d.Arguments,
-							})
+
+						// extra directives may be required. see entgo.io/contrib/entgql/schema.go
+						desc := entgql.MutationDescriptor{
+							Type:     genType,
+							IsCreate: target == CreateInputFieldTarget || target == CreateInputObjectTarget,
+						}
+						inputFields, err := desc.InputFields()
+						if err != nil {
+							return fmt.Errorf("entgql.MutationDescriptor.InputFields: %w", err)
+						}
+						for _, ifield := range inputFields {
+							pascalDfName := gen.Field{Name: df.FieldName}.StructField()
+							if ifield.StructField() != pascalDfName {
+								continue
+							}
+
+							if ifield.AppendOp {
+								if err := addDirectiveToField(t, "append"+ifield.StructField(), df.Directives); err != nil {
+									return fmt.Errorf("couldn't add directive to %q: %w", gqlType, err)
+								}
+							}
+							if ifield.ClearOp {
+								if err := addDirectiveToField(t, "clear"+ifield.StructField(), df.Directives); err != nil {
+									return fmt.Errorf("couldn't add directive to %q: %w", gqlType, err)
+								}
+							}
 						}
 					} else {
-						// assume directive assigned to object
-						for _, d := range df.Directives {
-							t.Directives = append(t.Directives, &ast.Directive{
-								Name:      d.Name,
-								Arguments: d.Arguments,
-							})
-						}
+						// assign to object
+						t.Directives = append(t.Directives, convertDirectives(df.Directives)...)
 					}
 
 				}
@@ -117,4 +171,24 @@ func applyDirectives(entityDirectives map[string][]DirectiveField) entgql.Schema
 		}
 		return nil
 	}
+}
+
+func convertDirectives(directives []entgql.Directive) []*ast.Directive {
+	result := make([]*ast.Directive, len(directives))
+	for i, d := range directives {
+		result[i] = &ast.Directive{
+			Name:      d.Name,
+			Arguments: d.Arguments,
+		}
+	}
+	return result
+}
+
+func addDirectiveToField(t *ast.Definition, fieldName string, directives []entgql.Directive) error {
+	field := t.Fields.ForName(fieldName)
+	if field == nil {
+		return fmt.Errorf("field %q not found", fieldName)
+	}
+	field.Directives = append(field.Directives, convertDirectives(directives)...)
+	return nil
 }

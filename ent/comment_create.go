@@ -57,15 +57,15 @@ func (cc *CommentCreate) SetNillableUpdatedAt(t *time.Time) *CommentCreate {
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (cc *CommentCreate) SetDeletedAt(b bool) *CommentCreate {
-	cc.mutation.SetDeletedAt(b)
+func (cc *CommentCreate) SetDeletedAt(t time.Time) *CommentCreate {
+	cc.mutation.SetDeletedAt(t)
 	return cc
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (cc *CommentCreate) SetNillableDeletedAt(b *bool) *CommentCreate {
-	if b != nil {
-		cc.SetDeletedAt(*b)
+func (cc *CommentCreate) SetNillableDeletedAt(t *time.Time) *CommentCreate {
+	if t != nil {
+		cc.SetDeletedAt(*t)
 	}
 	return cc
 }
@@ -208,7 +208,7 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 		_node.UpdatedAt = value
 	}
 	if value, ok := cc.mutation.DeletedAt(); ok {
-		_spec.SetField(comment.FieldDeletedAt, field.TypeBool, value)
+		_spec.SetField(comment.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
 	if nodes := cc.mutation.AuthorIDs(); len(nodes) > 0 {
