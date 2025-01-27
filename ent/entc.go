@@ -34,6 +34,12 @@ func main() {
 		entgql.WithSchemaHook(applyDirectives(map[string][]DirectiveField{
 			"User": {
 				{
+					Targets: []DirectiveTarget{CreateInputObjectTarget, UpdateInputObjectTarget},
+					Directives: []entgql.Directive{
+						schema.HasRoleDirective(user.RoleMODERATOR),
+					},
+				},
+				{
 					FieldName: "role",
 					Targets:   []DirectiveTarget{CreateInputFieldTarget, UpdateInputFieldTarget},
 					Directives: []entgql.Directive{
@@ -56,7 +62,7 @@ func main() {
 			gen.FeatureSnapshot,
 		},
 	}, entc.Extensions(ex)); err != nil {
-		log.Fatalf("running ent codegen: %v", err)
+		log.Fatalf("failed ent codegen: %v", err)
 	}
 }
 
@@ -135,7 +141,7 @@ func applyDirectives(entityDirectives map[string][]DirectiveField) entgql.Schema
 							return fmt.Errorf("couldn't add directive to %q: %w", gqlType, err)
 						}
 
-						// extra directives may be required. see entgo.io/contrib/entgql/schema.go
+						// extra directives may be required. see vendor/entgo.io/contrib/entgql/schema.go
 						desc := entgql.MutationDescriptor{
 							Type:     genType,
 							IsCreate: target == CreateInputFieldTarget || target == CreateInputObjectTarget,
@@ -152,12 +158,12 @@ func applyDirectives(entityDirectives map[string][]DirectiveField) entgql.Schema
 
 							if ifield.AppendOp {
 								if err := addDirectiveToField(t, "append"+ifield.StructField(), df.Directives); err != nil {
-									return fmt.Errorf("couldn't add directive to %q: %w", gqlType, err)
+									return fmt.Errorf("couldn't add append directive to %s.%s: %w", gqlType, df.FieldName, err)
 								}
 							}
 							if ifield.ClearOp {
 								if err := addDirectiveToField(t, "clear"+ifield.StructField(), df.Directives); err != nil {
-									return fmt.Errorf("couldn't add directive to %q: %w", gqlType, err)
+									return fmt.Errorf("couldn't add clear directive to %s.%s: %w", gqlType, df.FieldName, err)
 								}
 							}
 						}

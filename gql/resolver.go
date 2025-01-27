@@ -28,7 +28,7 @@ func NewResolver(entClient *ent.Client) Config {
 		},
 		Directives: DirectiveRoot{
 			HasRole: func(ctx context.Context, obj any, next graphql.Resolver, role user.Role) (res any, err error) {
-				log.Default().Printf("required role: %s", role)
+				log.Default().Printf("required role: %s (obj: %+v)", role, obj)
 				u, ok := internal.GetUserFromContext(ctx)
 				if !ok {
 					return nil, fmt.Errorf("unauthenticated")

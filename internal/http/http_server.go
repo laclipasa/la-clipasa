@@ -89,7 +89,7 @@ func RunServer(envFile string) {
 
 	srv := gql.NewServer(ctx)
 	router.Handle("/graphql", srv)
-	router.Handle("/graphiql", playground.Handler("GentQL", "/graphql"))
+	router.Handle("/graphiql", playground.ApolloSandboxHandler("GraphQL", "/graphql"))
 
 	addr := "localhost:" + cfg.APIPort
 	fmt.Printf("starting server at :%s\n", addr)

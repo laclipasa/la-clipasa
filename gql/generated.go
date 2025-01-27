@@ -8364,11 +8364,35 @@ func (ec *executionContext) unmarshalInputAdminUpdateUserInput(ctx context.Conte
 		switch k {
 		case "baseInput":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("baseInput"))
-			data, err := ec.unmarshalNUpdateUserInput2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐUpdateUserInput(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) {
+				return ec.unmarshalNUpdateUserInput2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚐUpdateUserInput(ctx, v)
 			}
-			it.BaseInput = data
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal *ent.UpdateUserInput
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *ent.UpdateUserInput
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*ent.UpdateUserInput); ok {
+				it.BaseInput = data
+			} else if tmp == nil {
+				it.BaseInput = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/laclipasa/la-clipasa/ent.UpdateUserInput`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "role":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
 			data, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, v)
@@ -9020,25 +9044,87 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		switch k {
 		case "displayName":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("displayName"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalNString2string(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.DisplayName = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.DisplayName = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "profileImage":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profileImage"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal *string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.ProfileImage = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ProfileImage = data
+			} else if tmp == nil {
+				it.ProfileImage = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "twitchID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("twitchID"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalNString2string(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.TwitchID = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.TwitchID = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "role":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
 			directive0 := func(ctx context.Context) (any, error) {
@@ -9046,7 +9132,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			}
 
 			directive1 := func(ctx context.Context) (any, error) {
-				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
 				if err != nil {
 					var zeroVal *user.Role
 					return zeroVal, err
@@ -9057,8 +9143,20 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				}
 				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
+			directive2 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal *user.Role
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *user.Role
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive1, role)
+			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -9072,17 +9170,39 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			}
 		case "awards":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("awards"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.Awards = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Awards = data
+			} else if tmp == nil {
+				it.Awards = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "deletedAt":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
 			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v) }
 
 			directive1 := func(ctx context.Context) (any, error) {
-				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
 				if err != nil {
 					var zeroVal *time.Time
 					return zeroVal, err
@@ -9093,8 +9213,20 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				}
 				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
+			directive2 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal *time.Time
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *time.Time
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive1, role)
+			}
 
-			tmp, err := directive1(ctx)
+			tmp, err := directive2(ctx)
 			if err != nil {
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
@@ -9108,32 +9240,120 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			}
 		case "savedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("savedPostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.SavedPostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.SavedPostIDs = data
+			} else if tmp == nil {
+				it.SavedPostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "likedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("likedPostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.LikedPostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.LikedPostIDs = data
+			} else if tmp == nil {
+				it.LikedPostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "postIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("postIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.PostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.PostIDs = data
+			} else if tmp == nil {
+				it.PostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "commentIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.CommentIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.CommentIDs = data
+			} else if tmp == nil {
+				it.CommentIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
@@ -10724,119 +10944,68 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		switch k {
 		case "displayName":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("displayName"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal *string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.DisplayName = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.DisplayName = data
+			} else if tmp == nil {
+				it.DisplayName = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "profileImage":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profileImage"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal *string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.ProfileImage = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.ProfileImage = data
+			} else if tmp == nil {
+				it.ProfileImage = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "clearProfileImage":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearProfileImage"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClearProfileImage = data
-		case "twitchID":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("twitchID"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TwitchID = data
-		case "role":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-			directive0 := func(ctx context.Context) (any, error) {
-				return ec.unmarshalOUserRole2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, v)
-			}
-
-			directive1 := func(ctx context.Context) (any, error) {
-				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
-				if err != nil {
-					var zeroVal *user.Role
-					return zeroVal, err
-				}
-				if ec.directives.HasRole == nil {
-					var zeroVal *user.Role
-					return zeroVal, errors.New("directive hasRole is not implemented")
-				}
-				return ec.directives.HasRole(ctx, obj, directive0, role)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*user.Role); ok {
-				it.Role = data
-			} else if tmp == nil {
-				it.Role = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/laclipasa/la-clipasa/ent/user.Role`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "awards":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("awards"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Awards = data
-		case "appendAwards":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appendAwards"))
-			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AppendAwards = data
-		case "clearAwards":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearAwards"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClearAwards = data
-		case "deletedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
-			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v) }
-
-			directive1 := func(ctx context.Context) (any, error) {
-				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
-				if err != nil {
-					var zeroVal *time.Time
-					return zeroVal, err
-				}
-				if ec.directives.HasRole == nil {
-					var zeroVal *time.Time
-					return zeroVal, errors.New("directive hasRole is not implemented")
-				}
-				return ec.directives.HasRole(ctx, obj, directive0, role)
-			}
-
-			tmp, err := directive1(ctx)
-			if err != nil {
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-			if data, ok := tmp.(*time.Time); ok {
-				it.DeletedAt = data
-			} else if tmp == nil {
-				it.DeletedAt = nil
-			} else {
-				err := fmt.Errorf(`unexpected type %T from directive, should be *time.Time`, tmp)
-				return it, graphql.ErrorOnPath(ctx, err)
-			}
-		case "clearDeletedAt":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearDeletedAt"))
 			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
 
 			directive1 := func(ctx context.Context) (any, error) {
-				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
 				if err != nil {
 					var zeroVal bool
 					return zeroVal, err
@@ -10853,6 +11022,243 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, graphql.ErrorOnPath(ctx, err)
 			}
 			if data, ok := tmp.(bool); ok {
+				it.ClearProfileImage = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "twitchID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("twitchID"))
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOString2ᚖstring(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal *string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*string); ok {
+				it.TwitchID = data
+			} else if tmp == nil {
+				it.TwitchID = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "role":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			directive0 := func(ctx context.Context) (any, error) {
+				return ec.unmarshalOUserRole2ᚖgithubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, v)
+			}
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal *user.Role
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *user.Role
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+			directive2 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal *user.Role
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *user.Role
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive1, role)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*user.Role); ok {
+				it.Role = data
+			} else if tmp == nil {
+				it.Role = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *github.com/laclipasa/la-clipasa/ent/user.Role`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "awards":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("awards"))
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.Awards = data
+			} else if tmp == nil {
+				it.Awards = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "appendAwards":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appendAwards"))
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOString2ᚕstringᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []string
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []string
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]string); ok {
+				it.AppendAwards = data
+			} else if tmp == nil {
+				it.AppendAwards = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "clearAwards":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearAwards"))
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(bool); ok {
+				it.ClearAwards = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "deletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deletedAt"))
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal *time.Time
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *time.Time
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+			directive2 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal *time.Time
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal *time.Time
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive1, role)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(*time.Time); ok {
+				it.DeletedAt = data
+			} else if tmp == nil {
+				it.DeletedAt = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be *time.Time`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "clearDeletedAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearDeletedAt"))
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
+			}
+			directive2 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "ADMIN")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive1, role)
+			}
+
+			tmp, err := directive2(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(bool); ok {
 				it.ClearDeletedAt = data
 			} else {
 				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
@@ -10860,88 +11266,344 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 			}
 		case "addSavedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addSavedPostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.AddSavedPostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.AddSavedPostIDs = data
+			} else if tmp == nil {
+				it.AddSavedPostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "removeSavedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeSavedPostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.RemoveSavedPostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.RemoveSavedPostIDs = data
+			} else if tmp == nil {
+				it.RemoveSavedPostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "clearSavedPosts":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearSavedPosts"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.ClearSavedPosts = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(bool); ok {
+				it.ClearSavedPosts = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "addLikedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addLikedPostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.AddLikedPostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.AddLikedPostIDs = data
+			} else if tmp == nil {
+				it.AddLikedPostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "removeLikedPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeLikedPostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.RemoveLikedPostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.RemoveLikedPostIDs = data
+			} else if tmp == nil {
+				it.RemoveLikedPostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "clearLikedPosts":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearLikedPosts"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.ClearLikedPosts = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(bool); ok {
+				it.ClearLikedPosts = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "addPostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addPostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.AddPostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.AddPostIDs = data
+			} else if tmp == nil {
+				it.AddPostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "removePostIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removePostIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.RemovePostIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.RemovePostIDs = data
+			} else if tmp == nil {
+				it.RemovePostIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "clearPosts":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearPosts"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.ClearPosts = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(bool); ok {
+				it.ClearPosts = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "addCommentIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addCommentIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.AddCommentIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.AddCommentIDs = data
+			} else if tmp == nil {
+				it.AddCommentIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "removeCommentIDs":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeCommentIDs"))
-			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOID2ᚕintᚄ(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal []int
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal []int
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.RemoveCommentIDs = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.([]int); ok {
+				it.RemoveCommentIDs = data
+			} else if tmp == nil {
+				it.RemoveCommentIDs = nil
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be []int`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		case "clearComments":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearComments"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
+			directive0 := func(ctx context.Context) (any, error) { return ec.unmarshalOBoolean2bool(ctx, v) }
+
+			directive1 := func(ctx context.Context) (any, error) {
+				role, err := ec.unmarshalNUserRole2githubᚗcomᚋlaclipasaᚋlaᚑclipasaᚋentᚋuserᚐRole(ctx, "MODERATOR")
+				if err != nil {
+					var zeroVal bool
+					return zeroVal, err
+				}
+				if ec.directives.HasRole == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive hasRole is not implemented")
+				}
+				return ec.directives.HasRole(ctx, obj, directive0, role)
 			}
-			it.ClearComments = data
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(bool); ok {
+				it.ClearComments = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be bool`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
 		}
 	}
 
