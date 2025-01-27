@@ -26,10 +26,3 @@ func hasRoleDirective(role user.Role) entgql.Directive {
 	}
 	return entgql.NewDirective("hasRole", args...)
 }
-
-func newHasRoleFieldInputDirective(role user.Role) entgql.Directive {
-	d := hasRoleDirective(role)
-	d.Skip = []entgql.SkipDirective{entgql.SkipDirectiveField}
-
-	return d
-}

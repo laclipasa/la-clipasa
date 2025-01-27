@@ -28,12 +28,9 @@ func (User) Fields() []ent.Field {
 		field.Enum("role").
 			Values("USER", "ADMIN", "MODERATOR").
 			Default("USER").
-			// we can skip fields on create default user. on update, via dedicated admin endpoints.
-			// alt: have privacy settings so we cannot mutate fields we are not allowed to
-			// alt: create Input types manually and have mutator per role
 			Annotations(entgql.Directives(
-				newHasRoleFieldInputDirective(user.RoleADMIN)),
-			),
+				hasRoleDirective(user.RoleADMIN).OnCreateMutationField().OnUpdateMutationField().SkipOnTypeField(),
+			)),
 		field.JSON("awards", []string{}).
 			Optional(),
 		field.Time("created_at").
