@@ -13,7 +13,7 @@ var baseGqlAnnotations = []schema.Annotation{
 	entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 }
 
-func hasRoleDirective(role user.Role) entgql.Directive {
+func HasRoleDirective(role user.Role) entgql.Directive {
 	var args []*ast.Argument
 	if role != "" {
 		args = append(args, &ast.Argument{

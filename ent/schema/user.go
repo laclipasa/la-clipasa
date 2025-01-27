@@ -3,12 +3,10 @@ package schema
 import (
 	"time"
 
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/laclipasa/la-clipasa/ent/user"
 )
 
 // User holds the schema definition for the User entity.
@@ -27,10 +25,7 @@ func (User) Fields() []ent.Field {
 			Unique(),
 		field.Enum("role").
 			Values("USER", "ADMIN", "MODERATOR").
-			Default("USER").
-			Annotations(entgql.Directives(
-				hasRoleDirective(user.RoleADMIN).OnCreateMutationField().OnUpdateMutationField().SkipOnTypeField(),
-			)),
+			Default("USER"),
 		field.JSON("awards", []string{}).
 			Optional(),
 		field.Time("created_at").
